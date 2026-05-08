@@ -1961,6 +1961,18 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .collab-pill .collab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:6px;vertical-align:middle;animation:collabPulse 1.2s infinite}
 @keyframes collabPulse{0%,100%{opacity:1}50%{opacity:.4}}
 
+/* Last editor pill no topbar */
+.last-editor-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:5px;background:var(--bg2);color:var(--text2);border:0.5px solid var(--border);margin-left:8px;vertical-align:middle;transition:all .2s}
+.last-editor-pill .le-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#888}
+.last-editor-pill .le-name{font-weight:500;color:var(--text);text-transform:none;letter-spacing:.02em;font-size:11px}
+.last-editor-pill .le-time{opacity:.7}
+
+/* Highlight em bloco recém-editado por outro usuário */
+.be-card.is-recently-edited{position:relative;animation:editGlow 3s ease-out;box-shadow:0 0 0 2px var(--collab-color,#1e3a73);border-radius:8px}
+@keyframes editGlow{0%{box-shadow:0 0 0 0 rgba(30,58,115,0)}10%{box-shadow:0 0 0 2px var(--collab-color,#1e3a73),0 0 22px 4px var(--collab-color,#1e3a73)}100%{box-shadow:0 0 0 0 rgba(30,58,115,0)}}
+.be-card.is-recently-edited .be-edit-tag{position:absolute;top:-12px;right:10px;display:inline-flex;align-items:center;gap:5px;background:var(--collab-color,#1e3a73);color:#fff;font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.18);opacity:0;animation:editTagShow 3s ease-out forwards;pointer-events:none;white-space:nowrap;z-index:30}
+@keyframes editTagShow{0%{opacity:0;transform:translateY(-4px)}10%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-2px)}}
+
 .share-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:#eff6ff;color:#1e3a73;border:0.5px solid #cfe0f5;margin-left:8px;vertical-align:middle;transition:background .2s,color .2s,border-color .2s}
 .share-badge.is-readonly{background:#fdf2ef;color:#8c3616;border-color:#f0d5cc}
 .share-badge.is-saving{background:#fff8e6;color:#7a5d00;border-color:#f1e0a8}
@@ -3683,9 +3695,13 @@ window.openSharedByToken=async function(token){
   _phaseC_decorateEditor();
   // Reset flag de RLS denied para nova sessão
   window._phaseC.saveDenied=false;
+  // Resolve identidade do user (cache pra last editor + cores)
+  _phaseC_resolveCurrentUser();
   // Inscreve realtime no roteiro + no share
   _subscribeRealtimeRoteiro(share.roteiro_id);
   _subscribeRealtimeShare(share.id);
+  // Mostra last editor existente, se houver
+  if(blob.lastEditor)_phaseC_renderLastEditorPill(blob.lastEditor);
   return{ok:true};
 };
 
@@ -3754,6 +3770,8 @@ window.exitSharedContext=function(){
   _unsubscribeRealtimeShare();
   S.sharedContext=null;
   window._phaseC.saveDenied=false;
+  clearInterval(window._phaseC.lastEditorTimer);
+  window._phaseC.lastEditorTimer=null;
   _phaseC_applyReadonlyClass(false);
   _phaseC_clearUrlToken();
   S.draft=null;
@@ -3820,13 +3838,112 @@ function _phaseC_blockDataIdOf(el){
   return null;
 }
 
+function _phaseC_blockKey(b){
+  // Chave de comparação: tudo do bloco menos a id (pra detectar edição estrutural)
+  if(!b)return '';
+  try{
+    return JSON.stringify({a:b.audio||'',v:b.video||'',n:b.notes||'',t:b.time||'',s:b.speaker||'',ph:b.phase||''});
+  }catch(e){return String(b.audio||'')+'|'+String(b.video||'');}
+}
+
+function _phaseC_diffBlocks(oldBlocks,newBlocks){
+  const oldMap={};(oldBlocks||[]).forEach(function(b){if(b&&b.id)oldMap[b.id]=_phaseC_blockKey(b);});
+  const changedIds=[];
+  (newBlocks||[]).forEach(function(b){
+    if(!b||!b.id)return;
+    const ok=oldMap[b.id];
+    const nk=_phaseC_blockKey(b);
+    if(ok===undefined||ok!==nk)changedIds.push(b.id);
+  });
+  return changedIds;
+}
+
+function _phaseC_highlightBlocks(ids,editor){
+  if(!Array.isArray(ids)||!ids.length)return;
+  const color=editor&&editor.id?_phaseC_userColor(editor.id):'#1e3a73';
+  const name=editor&&(editor.name||editor.email)?(editor.name||editor.email):'Colaborador';
+  const t=new Date(editor&&editor.at||Date.now());
+  const hh=String(t.getHours()).padStart(2,'0'),mm=String(t.getMinutes()).padStart(2,'0');
+  ids.forEach(function(id){
+    const card=document.getElementById('be-'+id);
+    if(!card)return;
+    card.style.setProperty('--collab-color',color);
+    card.classList.remove('is-recently-edited');
+    // re-trigger animação
+    void card.offsetWidth;
+    card.classList.add('is-recently-edited');
+    // tag flutuante
+    const old=card.querySelector('.be-edit-tag');if(old)old.remove();
+    const tag=document.createElement('div');
+    tag.className='be-edit-tag';
+    tag.textContent=name+' · '+hh+':'+mm;
+    card.appendChild(tag);
+    setTimeout(function(){card.classList.remove('is-recently-edited');const t2=card.querySelector('.be-edit-tag');if(t2)t2.remove();},3200);
+  });
+}
+
+function _phaseC_renderLastEditorPill(editor){
+  if(!editor)return;
+  const topbar=document.querySelector('.editor-topbar .section-label');
+  if(!topbar)return;
+  // remove pill antigo
+  const old=topbar.querySelector('.last-editor-pill');if(old)old.remove();
+  const me=_phaseC_currentUser();
+  if(me&&editor.id===me.id)return; // não mostra pill se a última edição foi minha
+  const pill=document.createElement('span');
+  pill.className='last-editor-pill';
+  const dot=document.createElement('span');dot.className='le-dot';dot.style.background=_phaseC_userColor(editor.id);
+  const name=document.createElement('span');name.className='le-name';name.textContent=editor.name||editor.email||'Colaborador';
+  const time=document.createElement('span');time.className='le-time';time.textContent=_phaseC_relativeTime(editor.at);
+  if(editor.email)pill.title=editor.email;
+  pill.appendChild(dot);pill.appendChild(name);pill.appendChild(time);
+  topbar.appendChild(pill);
+  // refresh do timer relativo
+  clearInterval(window._phaseC.lastEditorTimer);
+  window._phaseC.lastEditorTimer=setInterval(function(){
+    const cur=document.querySelector('.last-editor-pill .le-time');
+    if(cur)cur.textContent=_phaseC_relativeTime(editor.at);
+  },20000);
+}
+function _phaseC_relativeTime(ts){
+  if(!ts)return'';
+  const diff=Math.max(0,Math.floor((Date.now()-ts)/1000));
+  if(diff<10)return'agora';
+  if(diff<60)return'há '+diff+'s';
+  const m=Math.floor(diff/60);
+  if(m<60)return'há '+m+'min';
+  const h=Math.floor(m/60);
+  if(h<24)return'há '+h+'h';
+  const t=new Date(ts);
+  const hh=String(t.getHours()).padStart(2,'0'),mm=String(t.getMinutes()).padStart(2,'0');
+  return hh+':'+mm;
+}
+
 function _applyRemoteRoteiroUpdate(remoteRow){
-  if(!S.sharedContext||!remoteRow||String(remoteRow.id)!==String(S.sharedContext.roteiroId))return;
+  // Aceita o update mesmo SEM sharedContext (caso do dono editando seu próprio roteiro com convidado colab)
+  if(!remoteRow)return;
+  if(S.sharedContext){
+    if(String(remoteRow.id)!==String(S.sharedContext.roteiroId))return;
+  }else{
+    // Dono editando: só processa se for o mesmo roteiro do draft atual
+    if(!S.draft||!S.draft.id||String(remoteRow.id)!==String(S.draft.id))return;
+  }
   const remoteUpdated=Date.parse(remoteRow.updated_at||0)||0;
-  if(remoteUpdated&&remoteUpdated<=window._phaseC.lastApplied)return; // evita echo do próprio save
+  // Suprime echo do próprio save: comparação de timestamp + janela de 1500ms
+  if(remoteUpdated&&remoteUpdated<=window._phaseC.lastApplied)return;
+  if(window._phaseC.lastSaveAt&&Date.now()-window._phaseC.lastSaveAt<1500){
+    // Se a edição é minha (lastEditor === me), suprime
+    const me=_phaseC_currentUser();
+    const ed=remoteRow.data&&remoteRow.data.lastEditor;
+    if(me&&ed&&ed.id===me.id)return;
+  }
   const blob=remoteRow.data||{};
   const focused=_phaseC_focusedField();
   const focusedBlockId=focused?_phaseC_blockDataIdOf(focused):null;
+  // Detecta diff de blocos antes do merge
+  const oldBlocks=Array.isArray(S.draft&&S.draft.blocks)?S.draft.blocks:[];
+  const remoteBlocks=Array.isArray(blob.blocks)?blob.blocks:oldBlocks;
+  const changedIds=_phaseC_diffBlocks(oldBlocks,remoteBlocks).filter(function(id){return String(id)!==String(focusedBlockId);});
   // Aplica meta sem perturbar inputs focados
   const newDraft=Object.assign({},S.draft,{
     title:blob.title!==undefined?blob.title:S.draft.title,
@@ -3835,6 +3952,7 @@ function _applyRemoteRoteiroUpdate(remoteRow){
     audioPlayback:blob.audioPlayback||S.draft.audioPlayback,
     videoPlayback:blob.videoPlayback||S.draft.videoPlayback,
     versions:Array.isArray(blob.versions)?blob.versions:S.draft.versions,
+    lastEditor:blob.lastEditor||S.draft.lastEditor,
     updatedAt:remoteUpdated||Date.now()
   });
   // Mescla blocos: blocos atualmente em edição (focado dentro deles) ficam intactos
@@ -3847,7 +3965,6 @@ function _applyRemoteRoteiroUpdate(remoteRow){
         }
         return rb;
       });
-      // se houver bloco focado novo localmente que ainda não existe no remote, mantém
       const remoteIds=new Set(blob.blocks.map(function(b){return String(b.id);}));
       S.draft.blocks.forEach(function(b){
         if(!remoteIds.has(String(b.id))&&String(b.id)===String(focusedBlockId))newBlocks.push(b);
@@ -3859,16 +3976,22 @@ function _applyRemoteRoteiroUpdate(remoteRow){
   }
   S.draft=newDraft;
   window._phaseC.lastApplied=remoteUpdated||Date.now();
-  // Re-render de forma não destrutiva: se há foco, evita rerender total
+  // Re-render não-destrutivo
   try{
     if(!focused){
       window.renderEditor&&window.renderEditor();
-      _phaseC_decorateEditor();
+      if(S.sharedContext)_phaseC_decorateEditor();
     }else{
-      // Atualiza preview e cabeçalho mais leve
       window.updatePreview&&window.updatePreview();
     }
   }catch(e){console.warn('apply remote update:',e);}
+  // UI de quem editou o quê
+  const editor=blob.lastEditor;
+  if(editor){
+    _phaseC_renderLastEditorPill(editor);
+    // marca highlights nos blocos que mudaram (depois do render pra DOM existir)
+    setTimeout(function(){_phaseC_highlightBlocks(changedIds,editor);},focused?0:60);
+  }
   _showCollabPing();
 }
 
@@ -3878,6 +4001,38 @@ function _phaseC_isReadOnly(){
 }
 function _phaseC_isSharedEdit(){
   return !!(S.sharedContext&&S.sharedContext.permission==='edit');
+}
+
+// ── Identidade do usuário (pra last editor / colab) ──
+function _phaseC_currentUser(){
+  // Cache via _phaseC para evitar repetidos getSession.
+  return window._phaseC._cachedUser||null;
+}
+async function _phaseC_resolveCurrentUser(){
+  const sb=_phaseC_supabase();if(!sb||!sb.auth)return null;
+  try{
+    const{data}=await sb.auth.getSession();
+    const sess=data&&data.session;
+    if(!sess)return null;
+    const u=sess.user;
+    const meta=u.user_metadata||{};
+    const name=meta.full_name||meta.name||(u.email||'').split('@')[0]||'Colaborador';
+    const cached={id:u.id,email:u.email||'',name:name};
+    window._phaseC._cachedUser=cached;
+    return cached;
+  }catch(e){return null;}
+}
+function _phaseC_userColor(id){
+  // hash simples → cor consistente por usuário
+  let h=0;const s=String(id||'');
+  for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))&0xffffffff;}
+  const palette=['#1e3a73','#7a2c4d','#2c5e3a','#915b00','#4a2c7a','#a14b1e','#1f6b6b','#6b1f4a','#3a6b1f','#5b2cbf'];
+  return palette[Math.abs(h)%palette.length];
+}
+function _phaseC_buildEditorMeta(){
+  const u=_phaseC_currentUser();
+  if(!u)return null;
+  return{id:u.id,email:u.email,name:u.name,at:Date.now()};
 }
 function _phaseC_setStatus(kind,text){
   // kind: 'idle' | 'saving' | 'saved' | 'error' | 'denied'
@@ -3903,13 +4058,18 @@ async function _saveSharedRoteiroNow(){
   try{window.collectDOM&&window.collectDOM();}catch(e){}
   const d=S.draft;if(!d||!d.id)return{ok:false,error:'no-draft'};
   const now=Date.now();
+  const editor=_phaseC_buildEditorMeta();
   const blob={
     title:d.title||'',presenter:d.presenter||'',description:d.description||'',
     blocks:Array.isArray(d.blocks)?d.blocks:[],
     versions:Array.isArray(d.versions)?d.versions:[],
     audioPlayback:d.audioPlayback||1,videoPlayback:d.videoPlayback||1,
-    createdAt:d.createdAt||now,updatedAt:now
+    createdAt:d.createdAt||now,updatedAt:now,
+    lastEditor:editor||d.lastEditor||null
   };
+  // marca timestamps locais para suprimir echo do próprio save
+  window._phaseC.lastApplied=now;
+  window._phaseC.lastSaveAt=now;
   _phaseC_setStatus('saving','salvando…');
   _syncStart&&_syncStart();
   try{
@@ -3928,7 +4088,6 @@ async function _saveSharedRoteiroNow(){
       _syncError&&_syncError(true);
       return{ok:false,error:'rls-denied'};
     }
-    window._phaseC.lastApplied=now;
     const t=new Date(now);
     const hh=String(t.getHours()).padStart(2,'0'),mm=String(t.getMinutes()).padStart(2,'0');
     _phaseC_setStatus('saved','salvo às '+hh+':'+mm);
@@ -4111,6 +4270,31 @@ function _phaseC_installEditorWrap(){
 }
 _phaseC_installEditorWrap();
 
+// ── Wrap em remoteUpsertRoteiro: anexa lastEditor + marca lastApplied (Phase C) ──
+// Sem isso, o dono recebe echo do próprio save e re-renderiza desnecessariamente.
+function _phaseC_installUpsertWrap(){
+  if(window._phaseC_upsertWrapInstalled)return;
+  if(typeof window.remoteUpsertRoteiro!=='function'){
+    setTimeout(_phaseC_installUpsertWrap,0);return;
+  }
+  window._phaseC_upsertWrapInstalled=true;
+  const _orig=window.remoteUpsertRoteiro;
+  window.remoteUpsertRoteiro=async function(roteiro){
+    if(!roteiro)return _orig.apply(this,arguments);
+    // Injeta lastEditor (id + name + email + at) no payload
+    const editor=_phaseC_buildEditorMeta();
+    if(editor){
+      try{roteiro.lastEditor=editor;}catch(e){}
+    }
+    // Marca lastApplied antes do upsert pra suprimir echo do próprio save
+    const now=Date.now();
+    window._phaseC.lastApplied=now;
+    window._phaseC.lastSaveAt=now;
+    return _orig.call(this,roteiro);
+  };
+}
+_phaseC_installUpsertWrap();
+
 // ── Wraps de mutação + persistência (Phase C) ──
 // Em sharedContext.view: bloqueia tudo + toast "modo somente leitura".
 // Em sharedContext.edit: redireciona persistência para _saveSharedRoteiroNow/_saveSharedRoteiro
@@ -4214,6 +4398,30 @@ function _phaseC_installMutationWraps(){
   };
 }
 _phaseC_installMutationWraps();
+
+// ── Subscribe realtime no roteiro também para o DONO ao abrir editor ──
+// Sem isso, edições do convidado não chegam ao dono em tempo real.
+function _phaseC_installEditorEntryWrap(){
+  if(window._phaseC_entryWrapInstalled)return;
+  if(typeof window.goEditor!=='function'){setTimeout(_phaseC_installEditorEntryWrap,0);return;}
+  window._phaseC_entryWrapInstalled=true;
+  const _origGo=window.goEditor;
+  window.goEditor=function(r){
+    const out=_origGo.apply(this,arguments);
+    // Resolve e cacheia o user atual + tenta subscrever realtime do roteiro (sem sharedContext)
+    if(r&&r.id){
+      _phaseC_resolveCurrentUser().then(function(u){
+        if(!u)return;
+        // Só subscreve se ainda não está em sharedContext (sharedContext já cuida via openSharedByToken)
+        if(!S.sharedContext){
+          _subscribeRealtimeRoteiro(r.id);
+        }
+      });
+    }
+    return out;
+  };
+}
+_phaseC_installEditorEntryWrap();
 
 // ── Bloqueia Cmd/Ctrl+S em modo readonly (capture phase) ──
 document.addEventListener('keydown',function(e){
@@ -6751,6 +6959,8 @@ window.goTrello=function(){
   if(S.sharedContext&&typeof window.exitSharedContext==='function'){
     try{window.exitSharedContext();return;}catch(e){}
   }
+  // Desinscreve realtime do roteiro (caso o dono estivesse no editor)
+  try{if(typeof _unsubscribeRealtimeRoteiro==='function')_unsubscribeRealtimeRoteiro();}catch(e){}
   S.view='trello';
   S.workspaceTab='roteiros';
   try{localStorage.setItem('rmc_workspace_tab','roteiros');}catch(e){}
@@ -9152,6 +9362,8 @@ render();
     if(session){
       window.hideAuthScreen&&window.hideAuthScreen();
       _syncSetOffline&&_syncSetOffline(false);
+      // Resolve identidade pra last editor / colab
+      try{if(typeof _phaseC_resolveCurrentUser==='function')_phaseC_resolveCurrentUser();}catch(e){}
       // Hydrate em paralelo
       window.remoteHydrate&&window.remoteHydrate();
       // Se chegou com token, abre o roteiro compartilhado em vez de cair no fluxo normal
@@ -9164,6 +9376,7 @@ render();
       if(event==='SIGNED_IN'){
         window.hideAuthScreen&&window.hideAuthScreen();
         _syncSetOffline&&_syncSetOffline(false);
+        try{if(typeof _phaseC_resolveCurrentUser==='function')_phaseC_resolveCurrentUser();}catch(e){}
         window.remoteHydrate&&window.remoteHydrate();
         if(pendingToken){
           window.openSharedByToken&&window.openSharedByToken(pendingToken);
@@ -9179,7 +9392,12 @@ render();
         try{if(typeof _unsubscribeRealtimeRoteiro==='function')_unsubscribeRealtimeRoteiro();}catch(e){}
         try{if(typeof _unsubscribeRealtimeShare==='function')_unsubscribeRealtimeShare();}catch(e){}
         S.sharedContext=null;
-        if(window._phaseC)window._phaseC.saveDenied=false;
+        if(window._phaseC){
+          window._phaseC.saveDenied=false;
+          window._phaseC._cachedUser=null;
+          clearInterval(window._phaseC.lastEditorTimer);
+          window._phaseC.lastEditorTimer=null;
+        }
         if(document.body)document.body.classList.remove('is-share-readonly');
       }
     });
