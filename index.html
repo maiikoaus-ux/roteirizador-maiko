@@ -3913,8 +3913,10 @@ async function _saveSharedRoteiroNow(){
   _phaseC_setStatus('saving','salvando…');
   _syncStart&&_syncStart();
   try{
+    // Schema da Fase B: roteiros tem apenas id, user_id, data, updated_at.
+    // O título vai dentro de data.title (já incluído no blob acima).
     const{data,error}=await sb.from('roteiros')
-      .update({title:d.title||'',data:blob,updated_at:new Date(now).toISOString()})
+      .update({data:blob,updated_at:new Date(now).toISOString()})
       .eq('id',d.id)
       .select('id');
     if(error)throw error;
