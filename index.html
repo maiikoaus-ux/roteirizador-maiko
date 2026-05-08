@@ -1911,6 +1911,72 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .sb-sync.is-error .sync-dot{background:#ef4444}
 .sb-sync.is-offline .sync-dot{background:#9ca3af}
 .sb-sync[title]:hover::after{content:attr(title);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text);color:var(--bg);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:9.5px;white-space:nowrap;z-index:9999;pointer-events:none;letter-spacing:.04em}
+/* === SHARING (Phase C) === */
+.auth-google{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 14px;border-radius:7px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;transition:background .12s,border-color .12s;margin-top:2px}
+.auth-google:hover:not(:disabled){background:var(--bg2);border-color:var(--text2)}
+.auth-google:disabled{opacity:.55;cursor:not-allowed}
+.auth-google .auth-google-ico{width:16px;height:16px;flex-shrink:0}
+.auth-google.is-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.auth-google.is-primary:hover:not(:disabled){opacity:.86;background:var(--text)}
+.auth-or{display:flex;align-items:center;gap:10px;margin:6px 0;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.share-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px}
+.share-modal{background:var(--bg);border:0.5px solid var(--border);border-radius:14px;padding:22px 22px 18px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:14px;font-family:var(--font)}
+.share-modal-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.share-modal-title{font-size:14px;font-weight:500;line-height:1.3}
+.share-modal-sub{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-top:3px}
+.share-modal-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px;line-height:1}
+.share-modal-close:hover{color:var(--text)}
+.share-block{display:flex;flex-direction:column;gap:8px;padding:12px;border:0.5px dashed var(--border2);border-radius:8px;background:var(--bg2)}
+.share-block-title{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.share-input{font-family:var(--font);font-size:13px;padding:8px 11px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);width:100%;line-height:1.5}
+.share-input:focus{outline:none;border-color:var(--text2);box-shadow:0 0 0 2px rgba(0,0,0,.05)}
+.share-perm-row{display:flex;gap:6px}
+.share-perm-btn{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text2);cursor:pointer;transition:all .12s}
+.share-perm-btn.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+.share-perm-btn:not(.active):hover{background:var(--bg2);color:var(--text)}
+.share-actions{display:flex;gap:6px;flex-wrap:wrap}
+.share-actions .btn{flex:1;min-width:120px}
+.share-link-row{display:flex;gap:6px;align-items:center}
+.share-link-input{flex:1;font-family:var(--mono);font-size:11px}
+.share-link-input[readonly]{background:var(--bg2);cursor:text}
+.share-hint{font-size:11.5px;line-height:1.5;color:var(--text2)}
+.share-hint strong{color:var(--text)}
+.share-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto}
+.share-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:0.5px solid var(--border);border-radius:7px;background:var(--bg)}
+.share-item-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.share-item-email{font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.share-item-email.is-public{color:var(--text2);font-style:italic}
+.share-item-meta{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--text3)}
+.share-item-perm{font-family:var(--font);font-size:10.5px;padding:4px 7px;border:0.5px solid var(--border2);border-radius:5px;background:var(--bg);color:var(--text);cursor:pointer}
+.share-item-revoke{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border:0.5px solid #f0d5cc;border-radius:5px;background:transparent;color:#8c3616;cursor:pointer}
+.share-item-revoke:hover{background:#fdf2ef}
+.share-msg{font-size:11.5px;line-height:1.5;padding:8px 10px;border-radius:6px;border:0.5px solid var(--border);background:var(--bg2)}
+.share-msg.is-error{background:#fdf2ef;border-color:#f0d5cc;color:#8c3616}
+.share-msg.is-success{background:#f2f7ec;border-color:#d4e2c2;color:#3c6e08}
+
+.collab-pill{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:6px 14px;border-radius:20px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;z-index:9000;opacity:0;transition:opacity .25s ease;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.collab-pill.is-active{opacity:.94}
+.collab-pill .collab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:6px;vertical-align:middle;animation:collabPulse 1.2s infinite}
+@keyframes collabPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.share-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:#eff6ff;color:#1e3a73;border:0.5px solid #cfe0f5;margin-left:8px;vertical-align:middle}
+.share-badge.is-readonly{background:#fdf2ef;color:#8c3616;border-color:#f0d5cc}
+
+body.is-share-readonly .editor-chrome-btn--primary,
+body.is-share-readonly .editor-chrome-btn[onclick*="saveAndStay"],
+body.is-share-readonly .be-block-actions,
+body.is-share-readonly .add-block-btn,
+body.is-share-readonly .btn-ai,
+body.is-share-readonly .btn-fase,
+body.is-share-readonly .be-time,
+body.is-share-readonly .tag-btn,
+body.is-share-readonly .rich-editor[contenteditable="true"]{pointer-events:none}
+body.is-share-readonly .rich-editor[contenteditable="true"]{opacity:.85}
+
+.wc-act-share{color:#1e3a73;border-color:#cfe0f5}
+.wc-act-share:hover{background:#eff6ff}
 </style>
 <script>
 window.APP_LOGO_DATA_URL='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E';
@@ -2805,6 +2871,24 @@ window.authResetPassword=async function(email){
   }
 };
 
+window.authSignInWithGoogle=async function(){
+  const sb=_authClient();if(!sb)return{ok:false,error:'sdk'};
+  try{
+    // Mantém ?token= e ?p=g na URL pra o callback do OAuth voltar pro mesmo lugar.
+    const redirectTo=window.location.origin+window.location.pathname+window.location.search;
+    const{error}=await sb.auth.signInWithOAuth({
+      provider:'google',
+      options:{redirectTo:redirectTo}
+    });
+    if(error)throw error;
+    return{ok:true};
+  }catch(e){
+    const friendly=_authFriendlyError(e);
+    if(window.showToast)window.showToast(friendly);
+    return{ok:false,error:friendly};
+  }
+};
+
 function renderAuthScreen(){
   const st=window._authState;
   const logoUrl=window.APP_LOGO_DATA_URL||'';
@@ -2821,6 +2905,13 @@ function renderAuthScreen(){
       </div>
     </div>`:`
     <button type="button" class="auth-link" onclick="window._authToggleReset(true)">Esqueci minha senha</button>`;
+  const googlePrimary=window._authGoogleHighlighted?' is-primary':'';
+  const googleIco=`<svg class="auth-google-ico" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.48 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>`;
+  const googleBtnHtml=`
+      <button type="button" class="auth-google${googlePrimary}" onclick="window._authGoogleClick()" ${st.busy?'disabled':''} aria-label="Entrar com Google">
+        ${googleIco}<span>Continuar com Google</span>
+      </button>
+      <div class="auth-or"><span>ou com email</span></div>`;
   return`
     <div class="auth-card" role="dialog" aria-label="Autenticação">
       <div class="auth-logo">
@@ -2833,6 +2924,7 @@ function renderAuthScreen(){
         <button type="button" class="auth-tab ${!isSignin?'active':''}" role="tab" aria-selected="${!isSignin}" onclick="window._authSwitchMode('signup')" ${st.busy?'disabled':''}>Criar conta</button>
       </div>
       ${msgHtml}
+      ${googleBtnHtml}
       <form class="auth-form" onsubmit="event.preventDefault();window._authSubmit();">
         <div class="auth-field">
           <label class="auth-label" for="auth-email">Email</label>
@@ -2848,6 +2940,18 @@ function renderAuthScreen(){
       <div class="auth-foot">Acesso seguro · Supabase</div>
     </div>`;
 }
+
+window._authGoogleClick=async function(){
+  if(window._authState.busy)return;
+  window._authState.busy=true;_authRerender();
+  const r=await window.authSignInWithGoogle();
+  if(!r||!r.ok){
+    window._authState.busy=false;
+    window._authState.msg={kind:'error',text:(r&&r.error)||'Não foi possível abrir o login Google.'};
+    _authRerender();
+  }
+  // Se ok, o navegador será redirecionado pelo Supabase; não precisa rerender.
+};
 
 window._authSwitchMode=function(mode){
   if(window._authState.busy)return;
@@ -3159,13 +3263,19 @@ function _scheduleWorkspaceSave(){
 }
 
 // ── Hooks chamados pelas funções locais ──
-function _phaseB_workspaceHook(){if(_phaseB_ready)_scheduleWorkspaceSave();}
+function _phaseB_workspaceHook(){
+  if(!_phaseB_ready)return;
+  if(S.sharedContext)return; // não sobrescreve workspace remoto durante visualização compartilhada
+  _scheduleWorkspaceSave();
+}
 function _phaseB_persistRoteiroHook(r){
   if(!_phaseB_ready||!r||!r.id)return;
+  if(S.sharedContext)return; // sharedContext usa _saveSharedRoteiro (Fase C)
   _scheduleRemoteUpsertRoteiro(r,1);
 }
 function _phaseB_removeRoteiroHook(id){
   if(!_phaseB_ready||!id)return;
+  if(S.sharedContext)return;
   delete _persistRoteiroFails[id];
   window.remoteDeleteRoteiro(id);
 }
@@ -3339,6 +3449,565 @@ window.remoteHydrate=async function(){
     _syncOk();
   }
 };
+
+// === SECTION: SHARING + REALTIME (Phase C) ===
+// Tabela: shares (roteiro_id, owner_id, share_token, permission, expires_at, allowed_email, created_at)
+// RLS em roteiros: owner OU usuário com share válido pode ver/editar segundo permission.
+
+const SHARE_BASE_URL=window.location.origin+window.location.pathname;
+const SHARE_BUCKET_KEY='maiko_share_provider_hint';
+
+// Estado runtime de sharing/realtime
+window._phaseC={
+  channel:null,        // RealtimeChannel ativo
+  channelKey:null,     // id do roteiro inscrito
+  collabTimer:null,
+  saveTimer:null,
+  lastApplied:0,       // updated_at last applied (epoch ms)
+  shareModalEl:null
+};
+
+// ── Helpers ──
+function _phaseC_genToken(){
+  // 32 chars [a-z0-9]
+  if(window.crypto&&window.crypto.getRandomValues){
+    const b=new Uint8Array(24);window.crypto.getRandomValues(b);
+    return Array.from(b).map(function(x){return x.toString(36).padStart(2,'0').slice(-2);}).join('').slice(0,32);
+  }
+  return (Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2)).slice(0,32);
+}
+function _phaseC_supabase(){return window.supabase;}
+async function _phaseC_session(){
+  const sb=_phaseC_supabase();if(!sb||!sb.auth)return null;
+  const{data}=await sb.auth.getSession();return data&&data.session||null;
+}
+function _phaseC_urlToken(){
+  try{
+    const u=new URL(window.location.href);
+    const t=u.searchParams.get('token');
+    return t&&t.trim()?t.trim():null;
+  }catch(e){return null;}
+}
+function _phaseC_clearUrlToken(){
+  try{
+    const u=new URL(window.location.href);
+    u.searchParams.delete('token');
+    u.searchParams.delete('p');
+    const qs=u.searchParams.toString();
+    const newUrl=u.pathname+(qs?'?'+qs:'')+u.hash;
+    window.history.replaceState({},document.title,newUrl);
+  }catch(e){}
+}
+
+// ── CRUD shares ──
+window.shareRoteiro=async function(roteiroId,permission,opts){
+  permission=(permission==='edit')?'edit':'view';
+  const sess=await _phaseC_session();
+  if(!sess)return{ok:false,error:'Faça login para compartilhar.'};
+  const sb=_phaseC_supabase();
+  const token=_phaseC_genToken();
+  const row={
+    roteiro_id:roteiroId,
+    owner_id:sess.user.id,
+    share_token:token,
+    permission:permission,
+    allowed_email:(opts&&opts.allowedEmail)?String(opts.allowedEmail).toLowerCase().trim():null,
+    expires_at:(opts&&opts.expiresAt)||null
+  };
+  try{
+    const{data,error}=await sb.from('shares').insert(row).select().single();
+    if(error)throw error;
+    return{ok:true,share:data,url:SHARE_BASE_URL+'?token='+token};
+  }catch(e){
+    console.warn('shareRoteiro:',e);
+    return{ok:false,error:e.message||'Falha ao criar share.'};
+  }
+};
+
+window.unshareRoteiro=async function(shareId){
+  const sb=_phaseC_supabase();if(!sb)return{ok:false};
+  try{
+    const{error}=await sb.from('shares').delete().eq('id',shareId);
+    if(error)throw error;
+    return{ok:true};
+  }catch(e){
+    console.warn('unshareRoteiro:',e);
+    return{ok:false,error:e.message||'Falha ao revogar.'};
+  }
+};
+
+window.updateSharePermission=async function(shareId,permission){
+  permission=(permission==='edit')?'edit':'view';
+  const sb=_phaseC_supabase();if(!sb)return{ok:false};
+  try{
+    const{error}=await sb.from('shares').update({permission:permission}).eq('id',shareId);
+    if(error)throw error;
+    return{ok:true};
+  }catch(e){
+    console.warn('updateSharePermission:',e);
+    return{ok:false,error:e.message||'Falha ao atualizar permissão.'};
+  }
+};
+
+window.loadSharesForRoteiro=async function(roteiroId){
+  const sb=_phaseC_supabase();if(!sb)return[];
+  try{
+    const{data,error}=await sb.from('shares').select('*').eq('roteiro_id',roteiroId).order('created_at',{ascending:false});
+    if(error)throw error;
+    return Array.isArray(data)?data:[];
+  }catch(e){
+    console.warn('loadSharesForRoteiro:',e);
+    return[];
+  }
+};
+
+window.loadShareByToken=async function(token){
+  const sb=_phaseC_supabase();if(!sb||!token)return null;
+  try{
+    const{data,error}=await sb.from('shares').select('*').eq('share_token',token).maybeSingle();
+    if(error)throw error;
+    return data||null;
+  }catch(e){
+    console.warn('loadShareByToken:',e);
+    return null;
+  }
+};
+
+// ── Open shared roteiro ──
+window.openSharedByToken=async function(token){
+  const sb=_phaseC_supabase();if(!sb)return{ok:false,error:'sdk'};
+  const sess=await _phaseC_session();
+  if(!sess){
+    // Sem sessão: armazena o token na URL e mostra a tela de auth com Google em destaque.
+    try{
+      const u=new URL(window.location.href);
+      u.searchParams.set('token',token);
+      u.searchParams.set('p','g');
+      window.history.replaceState({},document.title,u.pathname+'?'+u.searchParams.toString()+u.hash);
+    }catch(e){}
+    window._authGoogleHighlighted=true;
+    window.showAuthScreen&&window.showAuthScreen();
+    return{ok:false,error:'Faça login para abrir o link compartilhado.'};
+  }
+  const share=await window.loadShareByToken(token);
+  if(!share){
+    if(window.showToast)window.showToast('Link inválido ou revogado.');
+    _phaseC_clearUrlToken();
+    return{ok:false,error:'Link inválido ou revogado.'};
+  }
+  if(share.expires_at){
+    const exp=Date.parse(share.expires_at);
+    if(!isNaN(exp)&&exp<Date.now()){
+      if(window.showToast)window.showToast('Link expirado.');
+      _phaseC_clearUrlToken();
+      return{ok:false,error:'Link expirado.'};
+    }
+  }
+  if(share.allowed_email){
+    const myEmail=String(sess.user.email||'').toLowerCase();
+    if(share.allowed_email!==myEmail){
+      if(window.showToast)window.showToast('Este link foi destinado a outro email.');
+      _phaseC_clearUrlToken();
+      return{ok:false,error:'Email não autorizado para este link.'};
+    }
+  }
+  // Carrega o roteiro pela RLS estendida (owner OR shares.user pode ver)
+  let roteiro=null;
+  try{
+    const{data,error}=await sb.from('roteiros').select('*').eq('id',share.roteiro_id).maybeSingle();
+    if(error)throw error;
+    roteiro=data;
+  }catch(e){
+    console.warn('open shared roteiro:',e);
+    if(window.showToast)window.showToast('Não foi possível carregar o roteiro.');
+    _phaseC_clearUrlToken();
+    return{ok:false,error:e.message||'Falha ao carregar.'};
+  }
+  if(!roteiro){
+    if(window.showToast)window.showToast('Roteiro não encontrado.');
+    _phaseC_clearUrlToken();
+    return{ok:false,error:'Roteiro não encontrado.'};
+  }
+  // Configura sharedContext
+  S.sharedContext={
+    token:token,
+    shareId:share.id,
+    roteiroId:share.roteiro_id,
+    ownerId:share.owner_id,
+    permission:share.permission==='edit'?'edit':'view',
+    isOwner:share.owner_id===sess.user.id
+  };
+  // Monta draft a partir do payload remoto
+  const blob=roteiro.data||{};
+  const draft={
+    id:roteiro.id,
+    title:blob.title||roteiro.title||'',
+    presenter:blob.presenter||'',
+    description:blob.description||'',
+    blocks:Array.isArray(blob.blocks)?blob.blocks:[],
+    versions:Array.isArray(blob.versions)?blob.versions:[],
+    audioPlayback:blob.audioPlayback||1,
+    videoPlayback:blob.videoPlayback||1,
+    createdAt:roteiro.created_at||blob.createdAt||Date.now(),
+    updatedAt:Date.parse(roteiro.updated_at||0)||blob.updatedAt||Date.now()
+  };
+  S.draft=draft;
+  S.view='editor';
+  _phaseC.lastApplied=draft.updatedAt||Date.now();
+  // Aplica modo readonly visual
+  _phaseC_applyReadonlyClass(S.sharedContext.permission==='view');
+  // Renderiza editor
+  try{window.renderEditor&&window.renderEditor();}catch(e){console.warn('renderEditor shared:',e);}
+  _phaseC_decorateEditor();
+  // Inscreve realtime
+  _subscribeRealtimeRoteiro(share.roteiro_id);
+  return{ok:true};
+};
+
+function _phaseC_applyReadonlyClass(on){
+  try{
+    if(on)document.body.classList.add('is-share-readonly');
+    else document.body.classList.remove('is-share-readonly');
+  }catch(e){}
+}
+
+function _phaseC_decorateEditor(){
+  // Adiciona pill no topbar do editor com badge de share + remove botão "Salvar roteiro" se view-only
+  if(!S.sharedContext)return;
+  const topbar=document.querySelector('.editor-topbar .section-label');
+  if(topbar&&!topbar.querySelector('.share-badge')){
+    const ro=S.sharedContext.permission==='view';
+    const badge=document.createElement('span');
+    badge.className='share-badge'+(ro?' is-readonly':'');
+    badge.textContent=ro?'somente leitura':'colab — edição';
+    topbar.appendChild(badge);
+  }
+  // Em view-only, remove o botão "Salvar roteiro" e troca "cancelar" por "Sair"
+  if(S.sharedContext.permission==='view'){
+    document.querySelectorAll('.editor-actions .editor-chrome-btn--primary').forEach(function(b){b.remove();});
+  }
+  document.querySelectorAll('.editor-actions .editor-chrome-btn').forEach(function(b){
+    if(b.textContent.trim().toLowerCase()==='cancelar'){
+      b.textContent='Sair do compartilhamento';
+      b.setAttribute('onclick','window.exitSharedContext()');
+    }
+  });
+  // Editor em view-only: força contenteditable=false
+  if(S.sharedContext.permission==='view'){
+    document.querySelectorAll('.rich-editor[contenteditable="true"]').forEach(function(el){el.setAttribute('contenteditable','false');});
+  }
+}
+
+window.exitSharedContext=function(){
+  _unsubscribeRealtimeRoteiro();
+  S.sharedContext=null;
+  _phaseC_applyReadonlyClass(false);
+  _phaseC_clearUrlToken();
+  S.draft=null;
+  S.view='trello';
+  try{window.render&&window.render();}catch(e){}
+};
+
+// ── Realtime ──
+function _subscribeRealtimeRoteiro(roteiroId){
+  const sb=_phaseC_supabase();if(!sb||!sb.channel)return;
+  _unsubscribeRealtimeRoteiro();
+  if(!roteiroId)return;
+  try{
+    const ch=sb.channel('roteiro:'+roteiroId);
+    ch.on('postgres_changes',{event:'UPDATE',schema:'public',table:'roteiros',filter:'id=eq.'+roteiroId},function(payload){
+      _applyRemoteRoteiroUpdate(payload&&payload.new);
+    });
+    ch.on('postgres_changes',{event:'DELETE',schema:'public',table:'roteiros',filter:'id=eq.'+roteiroId},function(){
+      if(window.showToast)window.showToast('Este roteiro foi removido pelo dono.');
+      window.exitSharedContext&&window.exitSharedContext();
+    });
+    ch.subscribe();
+    window._phaseC.channel=ch;
+    window._phaseC.channelKey=roteiroId;
+  }catch(e){console.warn('subscribe realtime:',e);}
+}
+function _unsubscribeRealtimeRoteiro(){
+  const sb=_phaseC_supabase();
+  const ch=window._phaseC.channel;
+  if(ch&&sb&&sb.removeChannel){try{sb.removeChannel(ch);}catch(e){}}
+  window._phaseC.channel=null;
+  window._phaseC.channelKey=null;
+}
+
+function _showCollabPing(){
+  let pill=document.getElementById('collab-pill');
+  if(!pill){
+    pill=document.createElement('div');
+    pill.id='collab-pill';
+    pill.className='collab-pill';
+    pill.innerHTML='<span class="collab-dot"></span>Atualizado por colaborador';
+    document.body.appendChild(pill);
+  }
+  pill.classList.add('is-active');
+  clearTimeout(window._phaseC.collabTimer);
+  window._phaseC.collabTimer=setTimeout(function(){pill.classList.remove('is-active');},1800);
+}
+
+function _phaseC_focusedField(){
+  const ae=document.activeElement;
+  if(!ae)return null;
+  if(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA')return ae;
+  if(ae.getAttribute&&ae.getAttribute('contenteditable')==='true')return ae;
+  return null;
+}
+function _phaseC_blockDataIdOf(el){
+  while(el&&el!==document.body){
+    if(el.dataset&&(el.dataset.blockId||el.id&&/^(audio|video|notes|time)-/.test(el.id))){
+      if(el.dataset.blockId)return el.dataset.blockId;
+      return el.id.replace(/^(audio|video|notes|time)-/,'');
+    }
+    el=el.parentElement;
+  }
+  return null;
+}
+
+function _applyRemoteRoteiroUpdate(remoteRow){
+  if(!S.sharedContext||!remoteRow||String(remoteRow.id)!==String(S.sharedContext.roteiroId))return;
+  const remoteUpdated=Date.parse(remoteRow.updated_at||0)||0;
+  if(remoteUpdated&&remoteUpdated<=window._phaseC.lastApplied)return; // evita echo do próprio save
+  const blob=remoteRow.data||{};
+  const focused=_phaseC_focusedField();
+  const focusedBlockId=focused?_phaseC_blockDataIdOf(focused):null;
+  // Aplica meta sem perturbar inputs focados
+  const newDraft=Object.assign({},S.draft,{
+    title:blob.title!==undefined?blob.title:S.draft.title,
+    presenter:blob.presenter!==undefined?blob.presenter:S.draft.presenter,
+    description:blob.description!==undefined?blob.description:S.draft.description,
+    audioPlayback:blob.audioPlayback||S.draft.audioPlayback,
+    videoPlayback:blob.videoPlayback||S.draft.videoPlayback,
+    versions:Array.isArray(blob.versions)?blob.versions:S.draft.versions,
+    updatedAt:remoteUpdated||Date.now()
+  });
+  // Mescla blocos: blocos atualmente em edição (focado dentro deles) ficam intactos
+  if(Array.isArray(blob.blocks)){
+    if(focusedBlockId){
+      const newBlocks=blob.blocks.map(function(rb){
+        if(String(rb.id)===String(focusedBlockId)){
+          const local=S.draft.blocks.find(function(b){return String(b.id)===String(focusedBlockId);});
+          return local||rb;
+        }
+        return rb;
+      });
+      // se houver bloco focado novo localmente que ainda não existe no remote, mantém
+      const remoteIds=new Set(blob.blocks.map(function(b){return String(b.id);}));
+      S.draft.blocks.forEach(function(b){
+        if(!remoteIds.has(String(b.id))&&String(b.id)===String(focusedBlockId))newBlocks.push(b);
+      });
+      newDraft.blocks=newBlocks;
+    }else{
+      newDraft.blocks=blob.blocks;
+    }
+  }
+  S.draft=newDraft;
+  window._phaseC.lastApplied=remoteUpdated||Date.now();
+  // Re-render de forma não destrutiva: se há foco, evita rerender total
+  try{
+    if(!focused){
+      window.renderEditor&&window.renderEditor();
+      _phaseC_decorateEditor();
+    }else{
+      // Atualiza preview e cabeçalho mais leve
+      window.updatePreview&&window.updatePreview();
+    }
+  }catch(e){console.warn('apply remote update:',e);}
+  _showCollabPing();
+}
+
+// ── Save em modo compartilhado (edit) ──
+function _saveSharedRoteiro(){
+  if(!S.sharedContext||S.sharedContext.permission!=='edit')return;
+  clearTimeout(window._phaseC.saveTimer);
+  window._phaseC.saveTimer=setTimeout(async function(){
+    const sb=_phaseC_supabase();if(!sb)return;
+    try{window.collectDOM&&window.collectDOM();}catch(e){}
+    const d=S.draft;if(!d||!d.id)return;
+    const now=Date.now();
+    const blob={
+      title:d.title||'',presenter:d.presenter||'',description:d.description||'',
+      blocks:Array.isArray(d.blocks)?d.blocks:[],
+      versions:Array.isArray(d.versions)?d.versions:[],
+      audioPlayback:d.audioPlayback||1,videoPlayback:d.videoPlayback||1,
+      createdAt:d.createdAt||now,updatedAt:now
+    };
+    try{
+      _syncStart&&_syncStart();
+      const{error}=await sb.from('roteiros').update({title:d.title||'',data:blob,updated_at:new Date(now).toISOString()}).eq('id',d.id);
+      if(error)throw error;
+      window._phaseC.lastApplied=now;
+      _syncOk&&_syncOk();
+    }catch(e){
+      console.warn('saveSharedRoteiro:',e);
+      _syncError&&_syncError(true);
+    }
+  },800);
+}
+
+// Hook de auto-save chamado pelos inputs (quando em sharedContext)
+window._phaseC_autoSave=function(){_saveSharedRoteiro();};
+
+// ── Modal de compartilhamento ──
+window.openShareModal=async function(roteiroId){
+  if(!roteiroId)return;
+  const sess=await _phaseC_session();
+  if(!sess){if(window.showToast)window.showToast('Faça login para compartilhar.');return;}
+  // Garante que o roteiro foi salvo remoto antes de gerar share
+  const r=window.getRoteiro?window.getRoteiro(roteiroId):null;
+  if(r&&_phaseB_ready&&typeof window.remoteUpsertRoteiro==='function'){
+    try{await window.remoteUpsertRoteiro(r);}catch(e){}
+  }
+  _phaseC_renderShareModal(roteiroId,sess);
+};
+
+async function _phaseC_renderShareModal(roteiroId,sess){
+  _phaseC_closeShareModal();
+  const overlay=document.createElement('div');
+  overlay.className='share-overlay';
+  overlay.id='share-overlay';
+  overlay.addEventListener('click',function(e){if(e.target===overlay)_phaseC_closeShareModal();});
+  document.body.appendChild(overlay);
+  window._phaseC.shareModalEl=overlay;
+  // Estado local
+  const state={roteiroId:roteiroId,permission:'view',allowedEmail:'',generatedUrl:'',msg:null,shares:[],loading:true};
+  function paint(){
+    const list=state.shares.map(function(s){
+      const url=SHARE_BASE_URL+'?token='+s.share_token;
+      const who=s.allowed_email?window.esc(s.allowed_email):'<span class="is-public">qualquer pessoa com o link</span>';
+      const meta=[
+        s.permission==='edit'?'edição':'visualização',
+        s.expires_at?'expira '+(new Date(s.expires_at).toLocaleDateString()):''
+      ].filter(Boolean).join(' · ');
+      return `
+        <div class="share-item" data-id="${window.esc(s.id)}">
+          <div class="share-item-info">
+            <div class="share-item-email">${who}</div>
+            <div class="share-item-meta">${window.esc(meta)}</div>
+          </div>
+          <select class="share-item-perm" data-id="${window.esc(s.id)}">
+            <option value="view"${s.permission!=='edit'?' selected':''}>Ver</option>
+            <option value="edit"${s.permission==='edit'?' selected':''}>Editar</option>
+          </select>
+          <button type="button" class="share-item-revoke" data-revoke="${window.esc(s.id)}" data-url="${window.esc(url)}" title="Copiar link"  onclick="navigator.clipboard&&navigator.clipboard.writeText('${window.esc(url)}');window.showToast&&window.showToast('Link copiado.');">Copiar</button>
+          <button type="button" class="share-item-revoke" data-revoke="${window.esc(s.id)}">Revogar</button>
+        </div>`;
+    }).join('');
+    const msgHtml=state.msg?`<div class="share-msg is-${state.msg.kind}">${window.esc(state.msg.text)}</div>`:'';
+    const linkHtml=state.generatedUrl?`
+      <div class="share-block">
+        <span class="share-block-title">Link recém-criado</span>
+        <div class="share-link-row">
+          <input class="share-input share-link-input" id="share-just-created" type="text" readonly value="${window.esc(state.generatedUrl)}">
+          <button type="button" class="btn btn-sm" onclick="(function(){const el=document.getElementById('share-just-created');if(el){el.select();}navigator.clipboard&&navigator.clipboard.writeText('${window.esc(state.generatedUrl)}');window.showToast&&window.showToast('Link copiado.');})()">Copiar</button>
+        </div>
+        <div class="share-hint">Compartilhe este link. Quem abrir vai precisar entrar (Google ou email/senha) antes de acessar.</div>
+      </div>`:'';
+    overlay.innerHTML=`
+      <div class="share-modal" role="dialog" aria-label="Compartilhar roteiro">
+        <div class="share-modal-hd">
+          <div>
+            <div class="share-modal-title">Compartilhar roteiro</div>
+            <div class="share-modal-sub">apenas roteiros salvos</div>
+          </div>
+          <button type="button" class="share-modal-close" onclick="window._phaseC_closeShareModal()" aria-label="Fechar">×</button>
+        </div>
+        ${msgHtml}
+        ${linkHtml}
+        <div class="share-block">
+          <span class="share-block-title">Novo link</span>
+          <div class="share-perm-row">
+            <button type="button" class="share-perm-btn${state.permission==='view'?' active':''}" onclick="window._phaseC_modalSetPerm('view')">Apenas ver</button>
+            <button type="button" class="share-perm-btn${state.permission==='edit'?' active':''}" onclick="window._phaseC_modalSetPerm('edit')">Pode editar</button>
+          </div>
+          <input id="share-allowed-email" class="share-input" type="email" placeholder="(opcional) restringir a um email"  value="${window.esc(state.allowedEmail||'')}">
+          <button type="button" class="btn btn-primary" onclick="window._phaseC_modalCreate()">Gerar link</button>
+        </div>
+        <div class="share-block">
+          <span class="share-block-title">Compartilhamentos ativos</span>
+          ${state.loading?'<div class="share-hint">Carregando...</div>':(state.shares.length?`<div class="share-list">${list}</div>`:'<div class="share-hint">Nenhum link ativo. Gere um acima.</div>')}
+        </div>
+      </div>`;
+    // bind perm select / revoke
+    overlay.querySelectorAll('.share-item-perm').forEach(function(sel){
+      sel.addEventListener('change',async function(){
+        const id=sel.getAttribute('data-id');
+        const r=await window.updateSharePermission(id,sel.value);
+        if(r.ok){state.msg={kind:'success',text:'Permissão atualizada.'};await refresh();}
+        else{state.msg={kind:'error',text:r.error||'Falha ao atualizar.'};paint();}
+      });
+    });
+    overlay.querySelectorAll('[data-revoke]').forEach(function(btn){
+      if(btn.classList.contains('share-item-revoke')&&btn.textContent.trim()==='Revogar'){
+        btn.addEventListener('click',async function(){
+          const id=btn.getAttribute('data-revoke');
+          const r=await window.unshareRoteiro(id);
+          if(r.ok){state.msg={kind:'success',text:'Acesso revogado.'};await refresh();}
+          else{state.msg={kind:'error',text:r.error||'Falha ao revogar.'};paint();}
+        });
+      }
+    });
+  }
+  async function refresh(){
+    state.loading=true;paint();
+    state.shares=await window.loadSharesForRoteiro(state.roteiroId);
+    state.loading=false;paint();
+  }
+  // Hooks expostos no escopo global para o markup do modal
+  window._phaseC_modalSetPerm=function(p){state.permission=p==='edit'?'edit':'view';paint();};
+  window._phaseC_modalCreate=async function(){
+    const emailEl=document.getElementById('share-allowed-email');
+    const allowed=emailEl?String(emailEl.value||'').trim():'';
+    const r=await window.shareRoteiro(state.roteiroId,state.permission,allowed?{allowedEmail:allowed}:null);
+    if(r.ok){state.generatedUrl=r.url;state.msg={kind:'success',text:'Link criado.'};state.allowedEmail='';await refresh();}
+    else{state.msg={kind:'error',text:r.error||'Falha ao criar link.'};paint();}
+  };
+  paint();
+  refresh();
+}
+window._phaseC_closeShareModal=function(){
+  const el=window._phaseC.shareModalEl;
+  if(el&&el.parentNode)el.parentNode.removeChild(el);
+  window._phaseC.shareModalEl=null;
+};
+
+// Garante hooks de auto-save em sharedContext (edit) e em workspace local (Fase B intacta)
+function _phaseC_installInputHooks(){
+  if(window._phaseC_inputHooksInstalled)return;
+  window._phaseC_inputHooksInstalled=true;
+  document.addEventListener('input',function(e){
+    if(!S.sharedContext||S.sharedContext.permission!=='edit')return;
+    // Apenas inputs do editor disparam auto-save
+    const t=e.target;if(!t)return;
+    const inEditor=t.closest&&t.closest('.editor-shell');
+    if(!inEditor)return;
+    _saveSharedRoteiro();
+  },true);
+}
+_phaseC_installInputHooks();
+
+// Late-binding wrap de window.renderEditor: re-aplica decoração + readonly após qualquer rerender em sharedContext.
+function _phaseC_installEditorWrap(){
+  if(window._phaseC_editorWrapInstalled)return;
+  if(typeof window.renderEditor!=='function'){
+    setTimeout(_phaseC_installEditorWrap,0);return;
+  }
+  window._phaseC_editorWrapInstalled=true;
+  const _orig=window.renderEditor;
+  window.renderEditor=function(){
+    const out=_orig.apply(this,arguments);
+    if(S.sharedContext){
+      _phaseC_applyReadonlyClass(S.sharedContext.permission==='view');
+      _phaseC_decorateEditor();
+    }
+    return out;
+  };
+}
+_phaseC_installEditorWrap();
+
 
 window.esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')};
 window.escAttr=function(s){return window.esc(s).replace(/\n/g,'&#10;')};
@@ -5817,6 +6486,10 @@ function cvUpdateBreadcrumb(){
 // ── Navigation ──────────────────────────────────────
 window.goCanvas=function(){S.view='home';S.draft=null;S.viewId=null;window._boardSearch='';window._CV.selected=null;window.render();};
 window.goTrello=function(){
+  // Em sharedContext, sair do contexto compartilhado também limpa realtime e ?token=
+  if(S.sharedContext&&typeof window.exitSharedContext==='function'){
+    try{window.exitSharedContext();return;}catch(e){}
+  }
   S.view='trello';
   S.workspaceTab='roteiros';
   try{localStorage.setItem('rmc_workspace_tab','roteiros');}catch(e){}
@@ -5900,6 +6573,7 @@ window.renderEditor=function(){
           <span class="section-label">editando roteiro</span>
           <div class="editor-actions">
             <button type="button" class="editor-chrome-btn" onclick="goTrello()">cancelar</button>
+            ${(!S.sharedContext&&S.draft&&S.draft.id&&Array.isArray(S.roteiros)&&S.roteiros.some(function(x){return x.id===S.draft.id;}))?`<button type="button" class="editor-chrome-btn" onclick="window.openShareModal('${S.draft.id}')" title="Compartilhar este roteiro">Compartilhar</button>`:''}
             <button type="button" class="editor-chrome-btn editor-chrome-btn--primary" onclick="saveAndStay()">Salvar roteiro</button>
           </div>
         </div>
@@ -7288,6 +7962,7 @@ window.renderTrello=function(){
         <div class="wc-card-actions">
           <button type="button" class="wc-act wc-act-edit" onclick="event.stopPropagation();goEditor(getRoteiro('${r.id}'))">Editar</button>
           <button type="button" class="wc-act-icon" onclick="event.stopPropagation();openTeleprompter('${r.id}')" title="Teleprompter">▶</button>
+          <button type="button" class="wc-act wc-act-share" onclick="event.stopPropagation();window.openShareModal('${r.id}')" title="Compartilhar">Compart.</button>
           <button type="button" class="wc-act" onclick="window.duplicateRoteiro('${r.id}',event)" title="Duplicar">Duplicar</button>
           <button type="button" class="wc-act" onclick="event.stopPropagation();showHistory('${r.id}')" title="Histórico">Hist.</button>
           <button type="button" class="wc-act wc-act-del" onclick="event.stopPropagation();confirmDelete('${r.id}',event)">Excl.</button>
@@ -8198,6 +8873,13 @@ render();
 // Registra listener para reagir a SIGNED_IN/SIGNED_OUT.
 // Em sessão ativa, dispara remoteHydrate para reconciliar com o Supabase.
 (async function bootstrapAuth(){
+  // Detecta ?p=g (retomada após login OAuth) e ?token= (link compartilhado)
+  let pendingToken=null;
+  try{
+    const u=new URL(window.location.href);
+    pendingToken=u.searchParams.get('token');
+    if(u.searchParams.get('p')==='g')window._authGoogleHighlighted=true;
+  }catch(e){}
   try{
     if(!window.supabase||!window.supabase.auth){
       window.showAuthScreen&&window.showAuthScreen();
@@ -8209,8 +8891,10 @@ render();
     if(session){
       window.hideAuthScreen&&window.hideAuthScreen();
       _syncSetOffline&&_syncSetOffline(false);
-      // Hydrate em paralelo: app já está renderizado com dados locais
+      // Hydrate em paralelo
       window.remoteHydrate&&window.remoteHydrate();
+      // Se chegou com token, abre o roteiro compartilhado em vez de cair no fluxo normal
+      if(pendingToken)window.openSharedByToken&&window.openSharedByToken(pendingToken);
     }else{
       window.showAuthScreen&&window.showAuthScreen();
       _syncSetOffline&&_syncSetOffline(true);
@@ -8220,12 +8904,21 @@ render();
         window.hideAuthScreen&&window.hideAuthScreen();
         _syncSetOffline&&_syncSetOffline(false);
         window.remoteHydrate&&window.remoteHydrate();
+        if(pendingToken){
+          window.openSharedByToken&&window.openSharedByToken(pendingToken);
+          pendingToken=null;
+        }
       }else if(event==='SIGNED_OUT'){
         window.showAuthScreen&&window.showAuthScreen();
         _phaseB_ready=false;
         _lastRemoteDocIds=new Set();
         _persistRoteiroFails={};
         _syncSetOffline&&_syncSetOffline(true);
+        // limpa contexto de share e realtime
+        try{window._unsubscribeRealtimeRoteiro&&window._unsubscribeRealtimeRoteiro();}catch(e){}
+        if(typeof _unsubscribeRealtimeRoteiro==='function'){try{_unsubscribeRealtimeRoteiro();}catch(e){}}
+        S.sharedContext=null;
+        if(document.body)document.body.classList.remove('is-share-readonly');
       }
     });
   }catch(e){
