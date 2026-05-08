@@ -1,0 +1,15 @@
+# Cópias de trabalho do app (mantidas só localmente)
+roteirizador-maiko-costa-v1.15.html
+roteirizador-maiko-costa-v1.15*backup*.html
+
+# Configurações locais do editor
+.cursor/
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs e temporários
+*.log
+*.tmp

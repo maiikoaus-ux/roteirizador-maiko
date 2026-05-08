@@ -1904,6 +1904,13 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .auth-reset-cancel:hover{background:var(--bg)}
 .auth-foot{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:center;margin-top:4px}
 @media(max-width:480px){.auth-card{padding:22px 18px 18px;border-radius:12px}}
+/* === SYNC INDICATOR (Phase B) === */
+.sb-sync{width:36px;height:36px;margin:0 auto;display:flex;align-items:center;justify-content:center;cursor:default;position:relative;border-radius:8px}
+.sb-sync .sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;transition:background .25s ease}
+.sb-sync.is-syncing .sync-dot{background:#eab308}
+.sb-sync.is-error .sync-dot{background:#ef4444}
+.sb-sync.is-offline .sync-dot{background:#9ca3af}
+.sb-sync[title]:hover::after{content:attr(title);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text);color:var(--bg);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:9.5px;white-space:nowrap;z-index:9999;pointer-events:none;letter-spacing:.04em}
 </style>
 <script>
 window.APP_LOGO_DATA_URL='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E';
@@ -1957,6 +1964,7 @@ window.applyAppLogoDataUrl=function(u){
   <div class="sb-bottom">
     <button class="sb-btn" title="Configurar IA" onclick="openApiKeyModal()">&#x1F511;</button>
     <button class="sb-btn" title="Sair da conta" onclick="window.authSignOut()">&#x23FB;</button>
+    <div class="sb-sync is-offline" id="sb-sync" title="Sem sessão" aria-live="polite"><span class="sync-dot"></span></div>
   </div>
 </aside>
 
@@ -2056,7 +2064,7 @@ function wsLoadBoardRaw(){
   if(x&&Array.isArray(x.columns))return JSON.parse(JSON.stringify(x));
   return{columns:[]};
 }
-function wsSaveBoardRaw(b){sSet(WS_BOARD_KEY,b);}
+function wsSaveBoardRaw(b){sSet(WS_BOARD_KEY,b);if(typeof _phaseB_workspaceHook==='function')_phaseB_workspaceHook();}
 function wsSyncIdxFromBoard(){
   const b=wsLoadBoardRaw();
   const flat=[];const seen=new Set();
@@ -2289,7 +2297,7 @@ window.wsInitBoardDnD=function(){
 function sGet(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
 function sSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 function sDel(k){try{localStorage.removeItem(k);return true}catch(e){return false}}
-function persistBeat(){try{localStorage.setItem('rmc_beat_cards',JSON.stringify(S.beatCards));}catch(e){}}
+function persistBeat(){try{localStorage.setItem('rmc_beat_cards',JSON.stringify(S.beatCards));}catch(e){}if(typeof _phaseB_workspaceHook==='function')_phaseB_workspaceHook();}
 
 function loadWorkspacePrefs(){
   try{
@@ -2460,6 +2468,7 @@ function persistRoteiro(r){
   }
   wsEnsureRoteiroInBoard(r.id);
   wsSyncIdxFromBoard();
+  if(typeof _phaseB_persistRoteiroHook==='function')_phaseB_persistRoteiroHook(r);
 }
 window.persistRoteiro=persistRoteiro;
 function removeRoteiro(id){
@@ -2471,6 +2480,7 @@ function removeRoteiro(id){
     window.showToast('Falha ao atualizar armazenamento local.');
   }
   wsSyncIdxFromBoard();
+  if(typeof _phaseB_removeRoteiroHook==='function')_phaseB_removeRoteiroHook(id);
 }
 
 
@@ -2934,6 +2944,400 @@ window.hideAuthScreen=function(){
   const appShell=document.getElementById('app-shell');
   if(appShell)appShell.style.display='';
   window._authState={mode:'signin',busy:false,resetOpen:false,msg:null};
+};
+
+// === SECTION: PERSISTENCE PHASE B (Supabase remote) ===
+// Cada chamada remota: confere sessão, faz fire-and-forget, atualiza indicador.
+// Erros são silenciosos (console.warn) e nunca lançam para o caller.
+// Hooks (_phaseB_*) são chamados pelas funções locais já existentes; só agem após _phaseB_ready=true.
+var _phaseB_ready=false;
+var _lastRemoteDocIds=new Set();
+var _wsSaveDebounce=null;
+var _persistRoteiroFails={}; // id -> attempt count
+const _LAST_USER_KEY='rmc_last_user_id';
+
+function _getLastUserId(){try{return localStorage.getItem(_LAST_USER_KEY)||null;}catch(e){return null;}}
+function _setLastUserId(uid){try{if(uid)localStorage.setItem(_LAST_USER_KEY,uid);}catch(e){}}
+// Limpa dados locais de roteiros/docs/workspace (para troca de usuário no mesmo navegador)
+function _clearLocalUserData(){
+  try{
+    const ids=sGet(IDX_KEY)||[];
+    ids.forEach(function(id){sDel(ROT_KEY(id));});
+    sDel(IDX_KEY);
+    S.roteiros=[];
+    sDel(DOCS_STORE_KEY);
+    S.docs=[];
+    S.activeDocId=null;
+    try{localStorage.removeItem('rmc_docs_active');}catch(e){}
+    sDel(WS_BOARD_KEY);
+    try{localStorage.removeItem('rmc_beat_cards');}catch(e){}
+    try{localStorage.removeItem('rmc_bb_arrows');}catch(e){}
+    S.beatCards=[];
+    window._bbArrows=[];
+  }catch(e){console.warn('_clearLocalUserData:',e);}
+}
+
+// ── Sync indicator state machine ──
+window._syncState={inflight:0,hasError:false,offline:true};
+function _syncSetOffline(off){window._syncState.offline=!!off;_syncRender();}
+function _syncStart(){window._syncState.inflight++;_syncRender();}
+function _syncOk(){
+  window._syncState.inflight=Math.max(0,window._syncState.inflight-1);
+  if(window._syncState.inflight===0)window._syncState.hasError=false;
+  _syncRender();
+}
+function _syncErr(){
+  window._syncState.inflight=Math.max(0,window._syncState.inflight-1);
+  window._syncState.hasError=true;
+  _syncRender();
+}
+function _syncRender(){
+  const el=document.getElementById('sb-sync');if(!el)return;
+  const s=window._syncState;
+  el.classList.toggle('is-offline',!!s.offline);
+  el.classList.toggle('is-syncing',!s.offline&&s.inflight>0&&!s.hasError);
+  el.classList.toggle('is-error',!s.offline&&s.hasError);
+  el.title=s.offline?'Sem sessão':(s.hasError?'Erro de sync':(s.inflight>0?'Sincronizando...':'Sincronizado'));
+}
+
+// ── Helper: session check ──
+async function _remoteSession(){
+  if(!window.supabase||!window.supabase.auth)return null;
+  try{const{data}=await window.supabase.auth.getSession();return data&&data.session||null;}
+  catch(e){return null;}
+}
+
+// ── Remote CRUD: roteiros ──
+window.remoteUpsertRoteiro=async function(roteiro){
+  const sess=await _remoteSession();if(!sess||!roteiro||!roteiro.id)return null;
+  _syncStart();
+  try{
+    const row={id:String(roteiro.id),user_id:sess.user.id,data:roteiro,updated_at:new Date().toISOString()};
+    const{error}=await window.supabase.from('roteiros').upsert(row,{onConflict:'id'});
+    if(error)throw error;
+    _syncOk();return{ok:true};
+  }catch(e){console.warn('remoteUpsertRoteiro:',e&&e.message||e);_syncErr();return{ok:false,error:e};}
+};
+window.remoteDeleteRoteiro=async function(id){
+  const sess=await _remoteSession();if(!sess||!id)return null;
+  _syncStart();
+  try{
+    const{error}=await window.supabase.from('roteiros').delete().eq('id',String(id)).eq('user_id',sess.user.id);
+    if(error)throw error;
+    _syncOk();return{ok:true};
+  }catch(e){console.warn('remoteDeleteRoteiro:',e&&e.message||e);_syncErr();return{ok:false,error:e};}
+};
+window.remoteLoadRoteiros=async function(){
+  const sess=await _remoteSession();if(!sess)return null;
+  _syncStart();
+  try{
+    const{data,error}=await window.supabase.from('roteiros').select('id,data,updated_at').eq('user_id',sess.user.id).order('updated_at',{ascending:false});
+    if(error)throw error;
+    _syncOk();return Array.isArray(data)?data:[];
+  }catch(e){console.warn('remoteLoadRoteiros:',e&&e.message||e);_syncErr();return null;}
+};
+
+// ── Remote CRUD: docs ──
+window.remoteUpsertDoc=async function(doc){
+  const sess=await _remoteSession();if(!sess||!doc||!doc.id)return null;
+  _syncStart();
+  try{
+    const row={id:String(doc.id),user_id:sess.user.id,data:doc,updated_at:new Date().toISOString()};
+    const{error}=await window.supabase.from('docs').upsert(row,{onConflict:'id'});
+    if(error)throw error;
+    _syncOk();return{ok:true};
+  }catch(e){console.warn('remoteUpsertDoc:',e&&e.message||e);_syncErr();return{ok:false,error:e};}
+};
+window.remoteDeleteDoc=async function(id){
+  const sess=await _remoteSession();if(!sess||!id)return null;
+  _syncStart();
+  try{
+    const{error}=await window.supabase.from('docs').delete().eq('id',String(id)).eq('user_id',sess.user.id);
+    if(error)throw error;
+    _syncOk();return{ok:true};
+  }catch(e){console.warn('remoteDeleteDoc:',e&&e.message||e);_syncErr();return{ok:false,error:e};}
+};
+window.remoteLoadDocs=async function(){
+  const sess=await _remoteSession();if(!sess)return null;
+  _syncStart();
+  try{
+    const{data,error}=await window.supabase.from('docs').select('id,data,updated_at').eq('user_id',sess.user.id).order('updated_at',{ascending:false});
+    if(error)throw error;
+    _syncOk();return Array.isArray(data)?data:[];
+  }catch(e){console.warn('remoteLoadDocs:',e&&e.message||e);_syncErr();return null;}
+};
+
+// ── Remote CRUD: workspace (single row per user) ──
+window.remoteSaveWorkspace=async function(data){
+  const sess=await _remoteSession();if(!sess)return null;
+  _syncStart();
+  try{
+    const row={user_id:sess.user.id,data:data||{},updated_at:new Date().toISOString()};
+    const{error}=await window.supabase.from('workspace').upsert(row,{onConflict:'user_id'});
+    if(error)throw error;
+    _syncOk();return{ok:true};
+  }catch(e){console.warn('remoteSaveWorkspace:',e&&e.message||e);_syncErr();return{ok:false,error:e};}
+};
+window.remoteLoadWorkspace=async function(){
+  const sess=await _remoteSession();if(!sess)return null;
+  _syncStart();
+  try{
+    const{data,error}=await window.supabase.from('workspace').select('data,updated_at').eq('user_id',sess.user.id).maybeSingle();
+    if(error)throw error;
+    _syncOk();return data||null;
+  }catch(e){console.warn('remoteLoadWorkspace:',e&&e.message||e);_syncErr();return null;}
+};
+
+// ── Workspace blob (collect/apply) ──
+function _collectWorkspaceBlob(){
+  let bbArrowStyle=null;
+  try{bbArrowStyle=localStorage.getItem(window._BB_ARROW_STYLE_KEY||'rmc_bb_arrow_style');}catch(e){}
+  return{
+    wsBoard:wsLoadBoardRaw(),
+    bbArrows:Array.isArray(window._bbArrows)?window._bbArrows:[],
+    beatCards:Array.isArray(S.beatCards)?S.beatCards:[],
+    prefs:{
+      workspaceTab:S.workspaceTab||'roteiros',
+      workspaceFilter:S.workspaceFilter||'all',
+      workspaceListFilter:S.workspaceListFilter||'all',
+      workspaceSort:S.workspaceSort||'recent',
+      docsSort:window._docsSort||null,
+      activeDocId:S.activeDocId||null,
+      bbArrowStyle:bbArrowStyle
+    }
+  };
+}
+function _applyWorkspaceBlob(data){
+  if(!data||typeof data!=='object')return;
+  // Aplicação acontece com _phaseB_ready=false (durante hydrate) → hooks são no-op,
+  // o que evita loop de save. _phaseB_ready é setado para true só após hydrate completar.
+  try{
+    if(data.wsBoard&&Array.isArray(data.wsBoard.columns)){wsSaveBoardRaw(data.wsBoard);}
+    if(Array.isArray(data.bbArrows)){
+      window._bbArrows=data.bbArrows;
+      try{localStorage.setItem('rmc_bb_arrows',JSON.stringify(data.bbArrows));}catch(e){}
+    }
+    if(Array.isArray(data.beatCards)){
+      S.beatCards=data.beatCards;
+      try{localStorage.setItem('rmc_beat_cards',JSON.stringify(S.beatCards));}catch(e){}
+    }
+    const p=data.prefs||{};
+    if(p.workspaceTab==='roteiros'||p.workspaceTab==='beatboard'||p.workspaceTab==='docs'){
+      S.workspaceTab=p.workspaceTab;
+      try{localStorage.setItem('rmc_workspace_tab',p.workspaceTab);}catch(e){}
+    }
+    const okF=['all','draft','ready','no_presenter','has_duration','has_blocks','long_text'];
+    if(okF.includes(p.workspaceFilter)){
+      S.workspaceFilter=p.workspaceFilter;
+      try{localStorage.setItem('rmc_workspace_filter',p.workspaceFilter);}catch(e){}
+    }
+    if(p.workspaceListFilter){
+      S.workspaceListFilter=String(p.workspaceListFilter);
+      try{localStorage.setItem('rmc_workspace_list',S.workspaceListFilter);}catch(e){}
+    }
+    if(['recent','title','duration','progress'].includes(p.workspaceSort)){
+      S.workspaceSort=p.workspaceSort;
+      try{localStorage.setItem('rmc_workspace_sort',p.workspaceSort);}catch(e){}
+    }
+    if(p.docsSort){
+      window._docsSort=p.docsSort;
+      try{localStorage.setItem('rmc_docs_list_sort',p.docsSort);}catch(e){}
+    }
+    if(p.activeDocId){
+      S.activeDocId=p.activeDocId;
+      try{localStorage.setItem('rmc_docs_active',p.activeDocId);}catch(e){}
+    }
+    if(p.bbArrowStyle){
+      try{localStorage.setItem(window._BB_ARROW_STYLE_KEY||'rmc_bb_arrow_style',p.bbArrowStyle);}catch(e){}
+    }
+  }catch(e){console.warn('_applyWorkspaceBlob:',e);}
+}
+function _scheduleWorkspaceSave(){
+  if(!_phaseB_ready)return;
+  clearTimeout(_wsSaveDebounce);
+  _wsSaveDebounce=setTimeout(function(){window.remoteSaveWorkspace(_collectWorkspaceBlob());},1500);
+}
+
+// ── Hooks chamados pelas funções locais ──
+function _phaseB_workspaceHook(){if(_phaseB_ready)_scheduleWorkspaceSave();}
+function _phaseB_persistRoteiroHook(r){
+  if(!_phaseB_ready||!r||!r.id)return;
+  _scheduleRemoteUpsertRoteiro(r,1);
+}
+function _phaseB_removeRoteiroHook(id){
+  if(!_phaseB_ready||!id)return;
+  delete _persistRoteiroFails[id];
+  window.remoteDeleteRoteiro(id);
+}
+function _scheduleRemoteUpsertRoteiro(r,attempt){
+  attempt=attempt||1;
+  Promise.resolve(window.remoteUpsertRoteiro(r)).then(function(res){
+    if(res&&res.ok){
+      delete _persistRoteiroFails[r.id];
+      return;
+    }
+    // sem-sessão (res===null) → silencioso, sem retry
+    if(res===null)return;
+    _persistRoteiroFails[r.id]=(_persistRoteiroFails[r.id]||0)+1;
+    if(attempt<2){
+      setTimeout(function(){_scheduleRemoteUpsertRoteiro(r,attempt+1);},3000);
+    }else{
+      if(window.showToast)window.showToast('Roteiro salvo localmente (sync pendente)');
+    }
+  });
+}
+
+// ── Wraps em window.* (definidos depois desta seção, então fazemos lazy via late-binding) ──
+// Os wraps reais para persistDocsStore e persistBbArrows são instalados em _phaseB_installLateWraps,
+// chamado uma vez no bootstrap (pois essas funções só existem mais adiante no script).
+function _phaseB_installLateWraps(){
+  if(window._phaseBLateWrapsInstalled)return;
+  window._phaseBLateWrapsInstalled=true;
+
+  // persistDocsStore: diff-based delete + upsert all + workspace save (pra activeDocId)
+  if(typeof window.persistDocsStore==='function'){
+    const _orig=window.persistDocsStore;
+    window.persistDocsStore=function(){
+      const r=_orig.apply(this,arguments);
+      if(_phaseB_ready){
+        const cur=new Set((Array.isArray(S.docs)?S.docs:[]).map(function(d){return d.id;}));
+        const removed=[];
+        _lastRemoteDocIds.forEach(function(id){if(!cur.has(id))removed.push(id);});
+        _lastRemoteDocIds=cur;
+        (Array.isArray(S.docs)?S.docs:[]).forEach(function(d){window.remoteUpsertDoc(d);});
+        removed.forEach(function(id){window.remoteDeleteDoc(id);});
+        _scheduleWorkspaceSave();
+      }
+      return r;
+    };
+  }
+
+  // persistBbArrows: workspace save
+  if(typeof window.persistBbArrows==='function'){
+    const _orig=window.persistBbArrows;
+    window.persistBbArrows=function(){
+      const r=_orig.apply(this,arguments);
+      _phaseB_workspaceHook();
+      return r;
+    };
+  }
+
+  // setWorkspaceTab/Filter/ListFilter/Sort: workspace save
+  ['setWorkspaceTab','setWorkspaceFilter','setWorkspaceListFilter','setWorkspaceSort'].forEach(function(name){
+    if(typeof window[name]==='function'){
+      const _orig=window[name];
+      window[name]=function(){
+        const r=_orig.apply(this,arguments);
+        _phaseB_workspaceHook();
+        return r;
+      };
+    }
+  });
+}
+
+// ── Replace local datasets from remote (used by hydrate) ──
+function _replaceLocalRoteiros(rows){
+  // rows: [{id, data, updated_at}]
+  const prevIds=sGet(IDX_KEY)||[];
+  const newRoteiros=[];
+  const newIds=[];
+  rows.forEach(function(row){
+    if(!row||!row.data||!row.id)return;
+    const r=row.data;
+    r.id=String(row.id);
+    if(typeof r.updatedAt!=='number'){
+      const t=row.updated_at?Date.parse(row.updated_at):Date.now();
+      r.updatedAt=isFinite(t)?t:Date.now();
+    }
+    newRoteiros.push(r);
+    newIds.push(r.id);
+    sSet(ROT_KEY(r.id),r);
+  });
+  // Remove locais que não estão no remoto
+  prevIds.forEach(function(pid){if(!newIds.includes(pid))sDel(ROT_KEY(pid));});
+  S.roteiros=newRoteiros;
+  sSet(IDX_KEY,newIds);
+  // Reconcilia o board (mantém colunas se existirem)
+  try{wsSyncIdxFromBoard();}catch(e){}
+}
+function _replaceLocalDocs(rows){
+  const arr=[];
+  rows.forEach(function(row){
+    if(!row||!row.data||!row.id)return;
+    const d=row.data;
+    d.id=String(row.id);
+    arr.push(d);
+  });
+  S.docs=arr;
+  try{sSet(DOCS_STORE_KEY,S.docs);}catch(e){}
+}
+
+// ── Hydrate principal ──
+window.remoteHydrate=async function(){
+  const sess=await _remoteSession();
+  if(!sess){_syncSetOffline(true);return;}
+  _syncSetOffline(false);
+
+  // Proteção cross-user: se outro usuário tinha dados nesse navegador, limpa o cache local.
+  // Migração local→remoto só ocorre se for o mesmo usuário OU primeiro uso (lastUid null).
+  const curUid=sess.user.id;
+  const lastUid=_getLastUserId();
+  const allowMigrateLocal=!lastUid||lastUid===curUid;
+  if(lastUid&&lastUid!==curUid){
+    _clearLocalUserData();
+    if(window.render&&(S.view==='home'||S.view==='trello'))try{window.render();}catch(e){}
+  }
+
+  _syncStart();
+  try{
+    const results=await Promise.allSettled([
+      window.remoteLoadRoteiros(),
+      window.remoteLoadDocs(),
+      window.remoteLoadWorkspace()
+    ]);
+    const remoteRots=(results[0].status==='fulfilled'&&results[0].value)?results[0].value:null;
+    const remoteDocs=(results[1].status==='fulfilled'&&results[1].value)?results[1].value:null;
+    const remoteWs  =(results[2].status==='fulfilled'&&results[2].value)?results[2].value:null;
+
+    // Roteiros
+    if(remoteRots&&remoteRots.length>0){
+      _replaceLocalRoteiros(remoteRots);
+    }else if(allowMigrateLocal&&Array.isArray(S.roteiros)&&S.roteiros.length>0){
+      // Migração silenciosa
+      S.roteiros.forEach(function(r){window.remoteUpsertRoteiro(r);});
+    }
+
+    // Docs
+    if(remoteDocs&&remoteDocs.length>0){
+      _replaceLocalDocs(remoteDocs);
+      _lastRemoteDocIds=new Set(remoteDocs.map(function(r){return String(r.id);}));
+    }else if(allowMigrateLocal&&Array.isArray(S.docs)&&S.docs.length>0){
+      _lastRemoteDocIds=new Set(S.docs.map(function(d){return d.id;}));
+      S.docs.forEach(function(d){window.remoteUpsertDoc(d);});
+    }else{
+      _lastRemoteDocIds=new Set();
+    }
+
+    // Workspace
+    if(remoteWs&&remoteWs.data&&Object.keys(remoteWs.data).length>0){
+      _applyWorkspaceBlob(remoteWs.data);
+    }else if(allowMigrateLocal){
+      // Migra workspace local
+      window.remoteSaveWorkspace(_collectWorkspaceBlob());
+    }
+
+    // Marca este browser como pertencente ao usuário atual
+    _setLastUserId(curUid);
+
+    // Re-render condicional (não interrompe editor/viewer)
+    if(S.view==='home'||S.view==='trello'){
+      try{window.render&&window.render();}catch(e){console.warn('render after hydrate:',e);}
+    }
+  }finally{
+    _phaseB_ready=true;
+    _phaseB_installLateWraps();
+    _syncOk();
+  }
 };
 
 window.esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')};
@@ -7789,32 +8193,45 @@ window.openCharNav=function(){
 
 render();
 
-// === SECTION: AUTH BOOTSTRAP (Phase A) ===
+// === SECTION: AUTH BOOTSTRAP (Phase A) + HYDRATE (Phase B) ===
 // Verifica sessão ativa e mostra a tela de auth se não houver.
 // Registra listener para reagir a SIGNED_IN/SIGNED_OUT.
+// Em sessão ativa, dispara remoteHydrate para reconciliar com o Supabase.
 (async function bootstrapAuth(){
   try{
     if(!window.supabase||!window.supabase.auth){
       window.showAuthScreen&&window.showAuthScreen();
+      _syncSetOffline&&_syncSetOffline(true);
       return;
     }
     const{data}=await window.supabase.auth.getSession();
     const session=data&&data.session;
     if(session){
       window.hideAuthScreen&&window.hideAuthScreen();
+      _syncSetOffline&&_syncSetOffline(false);
+      // Hydrate em paralelo: app já está renderizado com dados locais
+      window.remoteHydrate&&window.remoteHydrate();
     }else{
       window.showAuthScreen&&window.showAuthScreen();
+      _syncSetOffline&&_syncSetOffline(true);
     }
     window.supabase.auth.onAuthStateChange(function(event,sess){
       if(event==='SIGNED_IN'){
         window.hideAuthScreen&&window.hideAuthScreen();
+        _syncSetOffline&&_syncSetOffline(false);
+        window.remoteHydrate&&window.remoteHydrate();
       }else if(event==='SIGNED_OUT'){
         window.showAuthScreen&&window.showAuthScreen();
+        _phaseB_ready=false;
+        _lastRemoteDocIds=new Set();
+        _persistRoteiroFails={};
+        _syncSetOffline&&_syncSetOffline(true);
       }
     });
   }catch(e){
     console.error('Falha no bootstrap de auth:',e);
     window.showAuthScreen&&window.showAuthScreen();
+    _syncSetOffline&&_syncSetOffline(true);
   }
 })();
 
