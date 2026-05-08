@@ -1,0 +1,28 @@
+{
+  "name": "Roteirizador (BETA)",
+  "short_name": "Roteirizador",
+  "description": "Roteiro estruturado, workspace, beat board e docs.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a18",
+  "categories": ["productivity"],
+  "icons": [
+    {
+      "src": "logo-maiko-costa.png",
+      "type": "image/png",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "logo-maiko-costa.png",
+      "type": "image/png",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ]
+}
