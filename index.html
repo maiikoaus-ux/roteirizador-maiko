@@ -2375,13 +2375,269 @@ body.is-share-readonly [contenteditable]::before{opacity:.55}
   }
 
   /* Editor scroll com mais respiro de baixo (clear teclado iOS) */
-  #main.editor-mode .editor-scroll{padding:0 4px 120px!important}
+  #main.editor-mode .editor-scroll{padding:0 4px 140px!important}
+
+  /* TOOLBAR rich-text NÃO sticky no mobile (parar de "flutuar" com teclado iOS) */
+  #main.editor-mode .global-toolbar,
+  #main.editor-mode #global-toolbar{
+    position:relative!important;top:auto!important;
+  }
 }
 
 /* Esconde elementos mobile-only no desktop */
 @media (min-width:901px){
   #block-chips-bar{display:none!important}
   [data-aux-toggle]{display:none!important}
+  [data-overflow-toggle]{display:none!important}
+  [data-color-trigger]{display:none!important}
+  [data-tele-collapse]{display:none!important}
+  .editor-overflow-menu,.color-popover{display:none!important}
+}
+
+/* ============================================================
+   MOBILE-PRO REFACTOR — densidade, popover de cores, anti-zoom iOS,
+   topbar split com Salvar fixo, blocos enxutos, beat board mobile,
+   docs slim, teleprompter retrátil. Tudo @media(max-width:900px).
+   ============================================================ */
+@media (max-width:900px){
+  /* === ANTI-ZOOM iOS: inputs/textareas precisam ser >=16px === */
+  input[type="text"],input[type="search"],input[type="email"],
+  input[type="password"],input[type="number"],input[type="tel"],
+  input[type="url"],input:not([type]),
+  textarea, select,
+  [contenteditable="true"],
+  .rich-editor,
+  .meta-grid input,
+  .be-fields-wrap .rich-editor,
+  .notes-area,
+  .docs-page-sheets-root [contenteditable="true"],
+  .docs-page-sheets-root,
+  .be-speaker-input,
+  #notes-textarea,
+  .tele-edit-input,
+  .bb-card-text{
+    font-size:16px!important;
+  }
+  /* Selects compactos visualmente mas conteúdo legível */
+  select.rt-select{font-size:13px!important}
+
+  /* === EDITOR TOPBAR SPLIT: cancelar L | overflow | Salvar R === */
+  #main.editor-mode .editor-actions{
+    align-items:center;
+    gap:5px!important;
+  }
+  /* Ordem mobile: cancelar(1), Ferramentas(5), demais inline(20+), ⋯(50), Salvar(99) */
+  #main.editor-mode .editor-actions .editor-chrome-btn{order:30}
+  #main.editor-mode .editor-actions .editor-chrome-btn[onclick*="goTrello"]{order:1}
+  #main.editor-mode .editor-actions [data-aux-toggle]{order:5}
+  #main.editor-mode .editor-actions [data-overflow-toggle]{order:50;flex-shrink:0}
+  #main.editor-mode .editor-actions .editor-chrome-btn--primary{order:99;flex-shrink:0;margin-left:auto!important}
+  /* Esconde os secundários inline; ficam dentro do menu ⋯ */
+  #main.editor-mode .editor-actions [data-rep-injected],
+  #main.editor-mode .editor-actions [data-tele-injected],
+  #main.editor-mode .editor-actions [data-pdf-injected],
+  #main.editor-mode .editor-actions [data-share-injected]{
+    display:none!important;
+  }
+
+  /* Botão ⋯ Mais */
+  [data-overflow-toggle]{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;min-width:34px;height:30px;
+    font-size:16px;line-height:1;
+    flex-shrink:0;
+  }
+  body.is-editor-overflow-open [data-overflow-toggle]{
+    background:#1a1a18!important;color:#fff!important;border-color:#1a1a18!important;
+  }
+
+  /* Menu overflow flutuante (relatório/ler/pdf/Compartilhar) */
+  .editor-overflow-menu{
+    position:fixed;top:auto;right:8px;
+    z-index:120;
+    background:#fff;
+    border:0.5px solid rgba(0,0,0,.12);
+    border-radius:12px;
+    box-shadow:0 14px 40px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.06);
+    padding:6px;
+    display:none;flex-direction:column;gap:2px;
+    min-width:160px;
+    backdrop-filter:blur(8px);
+  }
+  body.is-editor-overflow-open .editor-overflow-menu{display:flex}
+  .editor-overflow-menu .ovr-item{
+    background:transparent;border:none;cursor:pointer;
+    padding:9px 12px;border-radius:8px;
+    text-align:left;font-size:13px;font-family:var(--font);
+    color:var(--text);
+    display:flex;align-items:center;gap:8px;
+    min-height:40px;line-height:1.2;
+  }
+  .editor-overflow-menu .ovr-item:hover,
+  .editor-overflow-menu .ovr-item:active{background:#f3f3f1}
+  .editor-overflow-menu .ovr-ico{font-size:14px;width:18px;text-align:center;opacity:.85}
+
+  /* === COLOR POPOVER (toolbar de cores compacta) === */
+  /* Esconder swatches/selects inline; mostrar só botão A▾ */
+  #main.editor-mode .global-toolbar .rt-color-group,
+  #main.editor-mode .global-toolbar select.rt-select{
+    display:none!important;
+  }
+  [data-color-trigger]{
+    flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    gap:2px;
+    width:auto;min-width:34px;height:28px;
+    padding:0 8px!important;
+    font-size:13px!important;font-weight:600;
+    border:0.5px solid rgba(0,0,0,.12);
+    border-radius:7px;
+    background:#fff;
+    color:var(--text);
+    cursor:pointer;
+  }
+  [data-color-trigger] .ct-bar{
+    width:14px;height:3px;border-radius:1px;
+    background:linear-gradient(90deg,#1a1a18 0 50%,#dc2626 50% 100%);
+    margin-left:4px;
+  }
+  body.is-color-popover-open [data-color-trigger]{
+    background:#1a1a18!important;color:#fff!important;border-color:#1a1a18!important;
+  }
+  /* Popover propriamente dito */
+  .color-popover{
+    position:fixed;
+    z-index:130;
+    background:#fff;
+    border:0.5px solid rgba(0,0,0,.12);
+    border-radius:14px;
+    box-shadow:0 18px 50px rgba(0,0,0,.2),0 2px 10px rgba(0,0,0,.07);
+    padding:12px;
+    display:none;flex-direction:column;gap:10px;
+    min-width:230px;max-width:300px;
+  }
+  body.is-color-popover-open .color-popover{display:flex}
+  .color-popover .cp-section{display:flex;flex-direction:column;gap:6px}
+  .color-popover .cp-label{
+    font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--text3);
+  }
+  .color-popover .cp-row{display:flex;flex-wrap:wrap;gap:6px}
+  .color-popover .cp-swatch{
+    width:30px;height:30px;border-radius:8px;
+    border:0.5px solid rgba(0,0,0,.12);
+    cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  .color-popover .cp-swatch.cp-clear{
+    display:flex;align-items:center;justify-content:center;
+    background:#fff;color:#888;font-size:13px;
+  }
+  .color-popover .cp-size-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .color-popover .cp-size-row select{
+    flex:1;min-height:34px;padding:0 10px;border-radius:8px;
+    border:0.5px solid rgba(0,0,0,.12);background:#fff;font-size:13px;
+  }
+
+  /* === BLOCK CONTENT COMPACT (para mobile, mais espaço pra escrita) === */
+  .be-card{margin-bottom:8px}
+  .be-header{
+    padding:6px 10px!important;
+    gap:4px 6px!important;
+  }
+  .be-header .be-block-num{font-size:9px!important;padding:1px 5px!important}
+  .be-header .btn-fase{font-size:9px!important;padding:3px 7px!important}
+  .be-header .tag-btn{font-size:9px!important;padding:3px 7px!important;height:auto!important}
+  /* Áudio/vídeo: mais espaço de escrita */
+  .be-fields-top-av .rich-editor,
+  .be-av-editors-row .rich-editor{
+    min-height:80px!important;
+    padding:8px 10px!important;
+    line-height:1.5;
+  }
+  /* Notas de direção: enxuto */
+  .be-field-notes-wrap .rich-editor{
+    min-height:44px!important;
+    max-height:120px!important;
+    padding:6px 10px!important;
+  }
+  /* Personagem: 1 linha compacta */
+  .be-fields-bottom .be-person-line{min-height:36px!important;padding:0 8px!important}
+  .be-fields-bottom .be-person-line .be-speaker-input{padding:6px 8px!important}
+  .be-fields-wrap{padding:10px!important}
+  .be-fields-bottom{gap:8px!important}
+  .be-fields-wrap .field-label{font-size:9px!important}
+
+  /* === WORKSPACE CARDS densidade === */
+  .wc-card{min-height:auto!important;border-radius:11px!important}
+  .wc-card-body{padding:9px 11px 4px!important;gap:2px!important}
+  .wc-card-stats,.wc-card-stats *{font-size:10px!important}
+  .wc-card-stats{padding:4px 0!important}
+  .wc-card-actions{padding:4px 6px 6px!important;gap:4px!important}
+  .wc-act,.wc-act-icon{height:30px!important;font-size:10.5px!important;padding:0 4px!important;border-radius:6px!important}
+  .wc-act svg,.wc-act-icon svg{width:14px;height:14px}
+
+  /* === BEAT BOARD compacto === */
+  .bb-card{
+    width:170px!important;
+    min-height:90px!important;
+    border-radius:10px!important;
+  }
+  .bb-card-hd{padding:7px 9px 4px!important;gap:5px!important}
+  .bb-card-color{width:12px!important;height:12px!important}
+  .bb-card-label{font-size:8.5px!important;letter-spacing:.1em!important}
+  .bb-card-body{padding:1px 9px 8px!important}
+  .bb-card-text{min-height:50px!important;line-height:1.45!important}
+  /* Toolbar do beat board passa a relativa, não compete pelo canvas */
+  .bb-toolbar{
+    position:relative!important;top:auto!important;left:auto!important;
+    margin:8px 8px 4px!important;
+    padding:0!important;
+    flex-wrap:wrap!important;gap:5px!important;
+  }
+  .bb-btn{padding:6px 10px!important;font-size:11.5px!important;min-height:30px!important}
+  /* Aumenta área tap das portas sem mexer no visual (pseudo invisível 28x28) */
+  .bb-port::before{
+    content:"";position:absolute;
+    top:-6px;left:-6px;right:-6px;bottom:-6px;
+    border-radius:50%;
+    background:transparent;
+    pointer-events:auto;
+  }
+  .bb-port{touch-action:none}
+
+  /* === DOCS slim === */
+  .workspace-v7.docs-app .docs-toolbar{padding:5px 6px 6px!important}
+  .docs-tb-row{min-height:0!important;row-gap:6px!important;padding:3px 4px!important}
+  .docs-tb-row+.docs-tb-row{margin-top:1px!important;padding-top:5px!important}
+  .docs-page-sheets-root{padding:14px 16px!important}
+  /* Esconder labels secundárias no mobile */
+  .docs-tb-mobile-hide{display:none!important}
+
+  /* === TELEPROMPTER retrátil === */
+  .tele-topbar{
+    flex-wrap:wrap!important;
+    gap:5px 6px!important;
+    padding:6px 10px!important;
+    transition:transform .22s ease;
+  }
+  .tele-topbar .tele-lbl,.tele-topbar .tele-title{font-size:10px!important}
+  .tele-topbar .tele-ctrl-grp{gap:4px!important}
+  .tele-topbar .tele-range{width:80px!important}
+  .tele-topbar select,.tele-topbar button{font-size:11px!important;padding:4px 8px!important;min-height:30px!important}
+  /* Modo imersivo: esconde topbar com toggle */
+  body.is-tele-collapsed .tele-topbar{transform:translateY(-100%);pointer-events:none}
+  [data-tele-collapse]{
+    position:fixed;top:8px;right:10px;z-index:9999;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(0,0,0,.55);color:#fff;
+    border:0.5px solid rgba(255,255,255,.2);
+    display:none;align-items:center;justify-content:center;
+    font-size:14px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  body.tele-overlay-open [data-tele-collapse]{display:inline-flex}
+  body.is-tele-collapsed [data-tele-collapse]{background:rgba(255,255,255,.18)}
 }
 </style>
 <script>
@@ -7850,7 +8106,7 @@ window.renderEditor=function(){
           <span class="section-label">editando roteiro</span>
           <div class="editor-actions">
             <button type="button" class="editor-chrome-btn" onclick="goTrello()">cancelar</button>
-            ${(!S.sharedContext&&S.draft&&S.draft.id&&Array.isArray(S.roteiros)&&S.roteiros.some(function(x){return x.id===S.draft.id;}))?`<button type="button" class="editor-chrome-btn" onclick="window.openShareModal('${S.draft.id}')" title="Compartilhar este roteiro">Compartilhar</button>`:''}
+            ${(!S.sharedContext&&S.draft&&S.draft.id&&Array.isArray(S.roteiros)&&S.roteiros.some(function(x){return x.id===S.draft.id;}))?`<button type="button" class="editor-chrome-btn" data-share-injected="1" onclick="window.openShareModal('${S.draft.id}')" title="Compartilhar este roteiro">Compartilhar</button>`:''}
             <button type="button" class="editor-chrome-btn editor-chrome-btn--primary" onclick="saveAndStay()">Salvar roteiro</button>
           </div>
         </div>
@@ -7948,8 +8204,8 @@ window.renderEditor=function(){
     }
     const actTop=editorPanel.querySelector('.editor-actions');
     if(actTop){
-      const tBtn=document.createElement('button');tBtn.type='button';tBtn.className='editor-chrome-btn';tBtn.title='Teleprompter';tBtn.textContent='▶ ler';tBtn.onclick=()=>openTeleprompter(null);
-      const pBtn=document.createElement('button');pBtn.type='button';pBtn.className='editor-chrome-btn';pBtn.title='Exportar PDF';pBtn.textContent='pdf';pBtn.onclick=exportPDF;
+      const tBtn=document.createElement('button');tBtn.type='button';tBtn.className='editor-chrome-btn';tBtn.title='Teleprompter';tBtn.textContent='▶ ler';tBtn.setAttribute('data-tele-injected','1');tBtn.onclick=()=>openTeleprompter(null);
+      const pBtn=document.createElement('button');pBtn.type='button';pBtn.className='editor-chrome-btn';pBtn.title='Exportar PDF';pBtn.textContent='pdf';pBtn.setAttribute('data-pdf-injected','1');pBtn.onclick=exportPDF;
       actTop.insertBefore(pBtn,actTop.firstChild);
       actTop.insertBefore(tBtn,actTop.firstChild);
     }
@@ -7990,6 +8246,10 @@ window.renderEditor=function(){
       };
       actions.insertBefore(auxBtn,actions.firstChild);
     }
+    /* MOBILE: menu overflow ⋯ (relatório/ler/pdf/Compartilhar) — Salvar fica fixo à direita */
+    if(typeof window._setupEditorOverflow==='function'){window._setupEditorOverflow();}
+    /* MOBILE: trigger A▾ + popover de cores no rich-text toolbar */
+    if(typeof window._setupColorPopover==='function'){window._setupColorPopover();}
     /* MOBILE: chips horizontais de navegação entre blocos */
     if(typeof window._renderBlockChips==='function'){window._renderBlockChips();}
     /* IntersectionObserver: marca chip ativo conforme scroll (sem remount) */
@@ -9058,6 +9318,318 @@ window.saveAndStay=function(){
     /* Garante que executa depois das definições inline */
     setTimeout(applyWraps,0);
   }
+})();
+
+/* ============================================================
+   MOBILE-PRO: Editor overflow menu (⋯) + Color popover (A▾)
+   - _setupEditorOverflow: cria botão ⋯ + dropdown ancorado com itens
+     (relatório, ▶ ler, pdf, Compartilhar). Salvar continua na barra.
+   - _setupColorPopover: cria botão A▾ na .global-toolbar + popover
+     ancorado com tamanho/cores texto/marca-texto.
+   - Listeners globais: tap fora fecha popover/menu; ESC fecha; resize
+     reposiciona; trocar de view limpa estado.
+   ============================================================ */
+(function(){
+  function isMobile(){
+    try{return window.matchMedia('(max-width:900px)').matches;}catch(e){return false;}
+  }
+
+  /* === EDITOR OVERFLOW MENU (⋯) === */
+  function buildOverflowMenu(actions){
+    var menu=document.createElement('div');
+    menu.className='editor-overflow-menu';
+    menu.id='editor-overflow-menu';
+    menu.setAttribute('role','menu');
+    /* Cada item delega ao handler do botão original (preserva lógica/condicional) */
+    function mkItem(label,ico,handler){
+      var b=document.createElement('button');
+      b.type='button';b.className='ovr-item';b.setAttribute('role','menuitem');
+      b.innerHTML='<span class="ovr-ico">'+ico+'</span>'+label;
+      b.onclick=function(ev){
+        ev&&ev.preventDefault&&ev.preventDefault();
+        document.body.classList.remove('is-editor-overflow-open');
+        try{handler&&handler();}catch(e){}
+      };
+      return b;
+    }
+    /* relatório */
+    menu.appendChild(mkItem('Relatório','◔',function(){
+      if(typeof window.openReport==='function')window.openReport(null);
+    }));
+    /* ▶ ler (teleprompter) */
+    menu.appendChild(mkItem('Teleprompter','▶',function(){
+      if(typeof window.openTeleprompter==='function')window.openTeleprompter(null);
+    }));
+    /* pdf */
+    menu.appendChild(mkItem('Exportar PDF','⤓',function(){
+      if(typeof window.exportPDF==='function')window.exportPDF();
+    }));
+    /* Compartilhar (apenas se não-shared e roteiro existe) */
+    if(window.S&&S.draft&&S.draft.id&&!S.sharedContext&&Array.isArray(S.roteiros)&&S.roteiros.some(function(x){return x.id===S.draft.id;})){
+      menu.appendChild(mkItem('Compartilhar','↗',function(){
+        if(typeof window.openShareModal==='function')window.openShareModal(S.draft.id);
+      }));
+    }
+    return menu;
+  }
+  function positionOverflowMenu(){
+    var btn=document.querySelector('[data-overflow-toggle]');
+    var menu=document.getElementById('editor-overflow-menu');
+    if(!btn||!menu)return;
+    var r=btn.getBoundingClientRect();
+    /* Posiciona logo abaixo do botão, alinhado à direita do botão */
+    var top=r.bottom+6;
+    var right=Math.max(8,window.innerWidth-r.right);
+    menu.style.top=top+'px';
+    menu.style.right=right+'px';
+    menu.style.left='auto';
+  }
+  window._setupEditorOverflow=function(){
+    var actions=document.querySelector('.editor-actions');
+    if(!actions)return;
+    /* Botão ⋯ Mais */
+    if(!actions.querySelector('[data-overflow-toggle]')){
+      var btn=document.createElement('button');
+      btn.type='button';btn.className='editor-chrome-btn';
+      btn.setAttribute('data-overflow-toggle','1');
+      btn.setAttribute('aria-haspopup','menu');
+      btn.setAttribute('aria-expanded','false');
+      btn.title='Mais ações';
+      btn.textContent='⋯';
+      btn.onclick=function(ev){
+        ev&&ev.preventDefault&&ev.preventDefault();
+        ev&&ev.stopPropagation&&ev.stopPropagation();
+        var open=document.body.classList.toggle('is-editor-overflow-open');
+        btn.setAttribute('aria-expanded',open?'true':'false');
+        if(open){positionOverflowMenu();}
+      };
+      actions.appendChild(btn);
+    }
+    /* Menu (apenas 1 instância, reutiliza) */
+    var menu=document.getElementById('editor-overflow-menu');
+    if(menu&&menu.parentNode)menu.parentNode.removeChild(menu);
+    menu=buildOverflowMenu(actions);
+    document.body.appendChild(menu);
+    positionOverflowMenu();
+  };
+
+  /* === COLOR POPOVER (A▾) === */
+  function buildColorPopover(){
+    var pop=document.createElement('div');
+    pop.className='color-popover';
+    pop.id='color-popover';
+    pop.setAttribute('role','dialog');
+    /* Tamanho */
+    var sec1=document.createElement('div');sec1.className='cp-section';
+    sec1.innerHTML='<span class="cp-label">Tamanho</span>'+
+      '<div class="cp-size-row"><select id="cp-size-sel">'+
+      '<option value="">Padrão</option>'+
+      '<option value="11">11</option>'+
+      '<option value="13">13</option>'+
+      '<option value="14">14</option>'+
+      '<option value="16">16</option>'+
+      '<option value="18">18</option>'+
+      '<option value="22">22</option>'+
+      '<option value="28">28</option>'+
+      '</select></div>';
+    pop.appendChild(sec1);
+    /* Cores de texto */
+    var textColors=[
+      ['#1a1a18','Preto'],['#dc2626','Vermelho'],['#16a34a','Verde'],['#2563eb','Azul'],
+      ['#ca8a04','Amarelo'],['#ea580c','Laranja'],['#db2777','Rosa'],['#7c3aed','Roxo']
+    ];
+    var sec2=document.createElement('div');sec2.className='cp-section';
+    var lbl2=document.createElement('span');lbl2.className='cp-label';lbl2.textContent='Cor do texto';
+    var row2=document.createElement('div');row2.className='cp-row';
+    textColors.forEach(function(c){
+      var sw=document.createElement('button');sw.type='button';sw.className='cp-swatch';
+      sw.style.background=c[0];sw.title=c[1];
+      sw.onmousedown=function(ev){ev.preventDefault();};
+      sw.onclick=function(){
+        document.execCommand('foreColor',false,c[0]);
+        closeColorPopover();
+      };
+      row2.appendChild(sw);
+    });
+    sec2.appendChild(lbl2);sec2.appendChild(row2);pop.appendChild(sec2);
+    /* Marca-texto */
+    var markColors=[
+      ['#fef08a','Amarelo'],['#bbf7d0','Verde'],['#fce7f3','Rosa']
+    ];
+    var sec3=document.createElement('div');sec3.className='cp-section';
+    var lbl3=document.createElement('span');lbl3.className='cp-label';lbl3.textContent='Marca-texto';
+    var row3=document.createElement('div');row3.className='cp-row';
+    markColors.forEach(function(c){
+      var sw=document.createElement('button');sw.type='button';sw.className='cp-swatch';
+      sw.style.background=c[0];sw.title=c[1];
+      sw.onmousedown=function(ev){ev.preventDefault();};
+      sw.onclick=function(){
+        document.execCommand('hiliteColor',false,c[0]);
+        closeColorPopover();
+      };
+      row3.appendChild(sw);
+    });
+    /* Botão limpar destaque */
+    var clear=document.createElement('button');clear.type='button';clear.className='cp-swatch cp-clear';
+    clear.textContent='✕';clear.title='Sem destaque';
+    clear.onmousedown=function(ev){ev.preventDefault();};
+    clear.onclick=function(){
+      document.execCommand('hiliteColor',false,'transparent');
+      closeColorPopover();
+    };
+    row3.appendChild(clear);
+    sec3.appendChild(lbl3);sec3.appendChild(row3);pop.appendChild(sec3);
+    /* Size handler */
+    sec1.querySelector('select').addEventListener('change',function(ev){
+      var v=ev.target.value;
+      if(!v){closeColorPopover();return;}
+      if(typeof window.rtApplySize==='function'){window.rtApplySize(v);}
+      else{document.execCommand('fontSize',false,'4');}
+      ev.target.value='';
+      closeColorPopover();
+    });
+    return pop;
+  }
+  function positionColorPopover(){
+    var btn=document.querySelector('[data-color-trigger]');
+    var pop=document.getElementById('color-popover');
+    if(!btn||!pop)return;
+    var r=btn.getBoundingClientRect();
+    var top=r.bottom+6;
+    /* Posiciona alinhado à esquerda do trigger, com 8px margin viewport */
+    var left=Math.max(8,Math.min(window.innerWidth-260,r.left));
+    pop.style.top=top+'px';
+    pop.style.left=left+'px';
+    pop.style.right='auto';
+  }
+  function closeColorPopover(){
+    document.body.classList.remove('is-color-popover-open');
+    var btn=document.querySelector('[data-color-trigger]');
+    if(btn)btn.setAttribute('aria-expanded','false');
+  }
+  window._setupColorPopover=function(){
+    var tb=document.querySelector('#main.editor-mode .global-toolbar')||document.getElementById('global-toolbar');
+    if(!tb)return;
+    /* Botão A▾ trigger antes do botão "Limpar" */
+    if(!tb.querySelector('[data-color-trigger]')){
+      var trig=document.createElement('button');
+      trig.type='button';trig.className='rt-btn';
+      trig.setAttribute('data-color-trigger','1');
+      trig.setAttribute('aria-haspopup','dialog');
+      trig.setAttribute('aria-expanded','false');
+      trig.title='Cores e tamanho';
+      trig.innerHTML='<span style="font-weight:700">A</span><span class="ct-bar"></span>';
+      trig.onmousedown=function(ev){ev.preventDefault();};
+      trig.onclick=function(ev){
+        ev&&ev.preventDefault&&ev.preventDefault();
+        ev&&ev.stopPropagation&&ev.stopPropagation();
+        var open=document.body.classList.toggle('is-color-popover-open');
+        trig.setAttribute('aria-expanded',open?'true':'false');
+        if(open)positionColorPopover();
+      };
+      /* Insere antes do botão "Limpar" se existir, senão append */
+      var limp=tb.querySelector('[title="Limpar formatação"]');
+      if(limp)tb.insertBefore(trig,limp);
+      else tb.appendChild(trig);
+    }
+    /* Popover (1 instância, reutiliza) */
+    var pop=document.getElementById('color-popover');
+    if(pop&&pop.parentNode)pop.parentNode.removeChild(pop);
+    pop=buildColorPopover();
+    document.body.appendChild(pop);
+    positionColorPopover();
+  };
+
+  /* === Listeners globais: dismiss por tap fora / ESC / resize === */
+  function onGlobalDown(ev){
+    var t=ev.target;
+    /* Overflow menu */
+    if(document.body.classList.contains('is-editor-overflow-open')){
+      var menu=document.getElementById('editor-overflow-menu');
+      var btnO=document.querySelector('[data-overflow-toggle]');
+      if(menu&&!menu.contains(t)&&btnO&&!btnO.contains(t)){
+        document.body.classList.remove('is-editor-overflow-open');
+        if(btnO)btnO.setAttribute('aria-expanded','false');
+      }
+    }
+    /* Color popover */
+    if(document.body.classList.contains('is-color-popover-open')){
+      var pop=document.getElementById('color-popover');
+      var btnC=document.querySelector('[data-color-trigger]');
+      if(pop&&!pop.contains(t)&&btnC&&!btnC.contains(t)){
+        closeColorPopover();
+      }
+    }
+  }
+  document.addEventListener('pointerdown',onGlobalDown,true);
+  document.addEventListener('keydown',function(ev){
+    if(ev.key==='Escape'){
+      if(document.body.classList.contains('is-editor-overflow-open')){
+        document.body.classList.remove('is-editor-overflow-open');
+      }
+      if(document.body.classList.contains('is-color-popover-open')){
+        closeColorPopover();
+      }
+    }
+  });
+  window.addEventListener('resize',function(){
+    if(document.body.classList.contains('is-editor-overflow-open'))positionOverflowMenu();
+    if(document.body.classList.contains('is-color-popover-open'))positionColorPopover();
+  });
+
+  /* Limpa estado ao sair do editor (ex.: voltar pra workspace) */
+  var _prevView=window.S?S.view:null;
+  setInterval(function(){
+    var v=window.S?S.view:null;
+    if(v!==_prevView){
+      _prevView=v;
+      document.body.classList.remove('is-editor-overflow-open','is-color-popover-open');
+    }
+  },400);
+})();
+
+/* ============================================================
+   MOBILE-PRO: Teleprompter retrátil
+   Adiciona botão flutuante que esconde a topbar do teleprompter
+   no mobile (modo imersivo). Usa body.is-tele-collapsed.
+   ============================================================ */
+(function(){
+  function ensureCollapseBtn(overlay){
+    if(!overlay)return;
+    if(document.querySelector('[data-tele-collapse]'))return;
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.setAttribute('data-tele-collapse','1');
+    btn.title='Modo imersivo (esconder controles)';
+    btn.textContent='≡';
+    btn.onclick=function(ev){
+      ev&&ev.preventDefault&&ev.preventDefault();
+      document.body.classList.toggle('is-tele-collapsed');
+    };
+    document.body.appendChild(btn);
+  }
+  function cleanup(){
+    document.body.classList.remove('is-tele-collapsed','tele-overlay-open');
+    var b=document.querySelector('[data-tele-collapse]');
+    if(b&&b.parentNode)b.parentNode.removeChild(b);
+  }
+  /* Observa criação/remoção do .tele-overlay */
+  var mo=new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes&&m.addedNodes.forEach(function(n){
+        if(n.nodeType===1&&n.classList&&n.classList.contains('tele-overlay')){
+          document.body.classList.add('tele-overlay-open');
+          ensureCollapseBtn(n);
+        }
+      });
+      m.removedNodes&&m.removedNodes.forEach(function(n){
+        if(n.nodeType===1&&n.classList&&n.classList.contains('tele-overlay')){
+          cleanup();
+        }
+      });
+    });
+  });
+  mo.observe(document.body,{childList:true});
 })();
 
 window.duplicateBlock=function(id){
