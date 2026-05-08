@@ -1961,19 +1961,41 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .collab-pill .collab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:6px;vertical-align:middle;animation:collabPulse 1.2s infinite}
 @keyframes collabPulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-.share-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:#eff6ff;color:#1e3a73;border:0.5px solid #cfe0f5;margin-left:8px;vertical-align:middle}
+.share-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:5px;background:#eff6ff;color:#1e3a73;border:0.5px solid #cfe0f5;margin-left:8px;vertical-align:middle;transition:background .2s,color .2s,border-color .2s}
 .share-badge.is-readonly{background:#fdf2ef;color:#8c3616;border-color:#f0d5cc}
+.share-badge.is-saving{background:#fff8e6;color:#7a5d00;border-color:#f1e0a8}
+.share-badge.is-saved{background:#f2f7ec;color:#3c6e08;border-color:#d4e2c2}
+.share-badge.is-error{background:#fdf2ef;color:#8c3616;border-color:#f0d5cc}
 
 body.is-share-readonly .editor-chrome-btn--primary,
 body.is-share-readonly .editor-chrome-btn[onclick*="saveAndStay"],
+body.is-share-readonly .editor-actions [onclick*="openShareModal"],
 body.is-share-readonly .be-block-actions,
 body.is-share-readonly .add-block-btn,
 body.is-share-readonly .btn-ai,
 body.is-share-readonly .btn-fase,
 body.is-share-readonly .be-time,
 body.is-share-readonly .tag-btn,
-body.is-share-readonly .rich-editor[contenteditable="true"]{pointer-events:none}
-body.is-share-readonly .rich-editor[contenteditable="true"]{opacity:.85}
+body.is-share-readonly .be-footer-right,
+body.is-share-readonly .be-block-footer,
+body.is-share-readonly .be-block-footer button,
+body.is-share-readonly .speaker-select,
+body.is-share-readonly .editor-shell select,
+body.is-share-readonly .editor-shell input,
+body.is-share-readonly .editor-shell textarea,
+body.is-share-readonly .editor-shell [contenteditable="true"],
+body.is-share-readonly .rich-editor[contenteditable="true"]{pointer-events:none !important}
+body.is-share-readonly .rich-editor[contenteditable="true"],
+body.is-share-readonly .editor-shell [contenteditable="true"]{opacity:.92;cursor:default}
+body.is-share-readonly .be-footer-right,
+body.is-share-readonly .be-block-actions,
+body.is-share-readonly .add-block-btn,
+body.is-share-readonly .editor-chrome-btn--primary,
+body.is-share-readonly .editor-actions [onclick*="openShareModal"]{display:none !important}
+body.is-share-readonly .global-toolbar{display:none !important}
+body.is-share-readonly input::placeholder,
+body.is-share-readonly textarea::placeholder,
+body.is-share-readonly [contenteditable]::before{opacity:.55}
 
 .wc-act-share{color:#1e3a73;border-color:#cfe0f5}
 .wc-act-share:hover{background:#eff6ff}
@@ -3659,8 +3681,11 @@ window.openSharedByToken=async function(token){
   // Renderiza editor
   try{window.renderEditor&&window.renderEditor();}catch(e){console.warn('renderEditor shared:',e);}
   _phaseC_decorateEditor();
-  // Inscreve realtime
+  // Reset flag de RLS denied para nova sessão
+  window._phaseC.saveDenied=false;
+  // Inscreve realtime no roteiro + no share
   _subscribeRealtimeRoteiro(share.roteiro_id);
+  _subscribeRealtimeShare(share.id);
   return{ok:true};
 };
 
@@ -3672,19 +3697,29 @@ function _phaseC_applyReadonlyClass(on){
 }
 
 function _phaseC_decorateEditor(){
-  // Adiciona pill no topbar do editor com badge de share + remove botão "Salvar roteiro" se view-only
   if(!S.sharedContext)return;
+  const ro=S.sharedContext.permission==='view';
+  // Badge no topbar
   const topbar=document.querySelector('.editor-topbar .section-label');
   if(topbar&&!topbar.querySelector('.share-badge')){
-    const ro=S.sharedContext.permission==='view';
     const badge=document.createElement('span');
     badge.className='share-badge'+(ro?' is-readonly':'');
     badge.textContent=ro?'somente leitura':'colab — edição';
     topbar.appendChild(badge);
+  }else if(topbar){
+    const badge=topbar.querySelector('.share-badge');
+    if(badge){
+      badge.classList.toggle('is-readonly',ro);
+      // só reseta texto se não tiver status sendo exibido
+      if(!badge.classList.contains('is-saving')&&!badge.classList.contains('is-saved')&&!badge.classList.contains('is-error')){
+        badge.textContent=ro?'somente leitura':'colab — edição';
+      }
+    }
   }
-  // Em view-only, remove o botão "Salvar roteiro" e troca "cancelar" por "Sair"
-  if(S.sharedContext.permission==='view'){
+  // Topbar actions
+  if(ro){
     document.querySelectorAll('.editor-actions .editor-chrome-btn--primary').forEach(function(b){b.remove();});
+    document.querySelectorAll('.editor-actions [onclick*="openShareModal"]').forEach(function(b){b.remove();});
   }
   document.querySelectorAll('.editor-actions .editor-chrome-btn').forEach(function(b){
     if(b.textContent.trim().toLowerCase()==='cancelar'){
@@ -3692,15 +3727,33 @@ function _phaseC_decorateEditor(){
       b.setAttribute('onclick','window.exitSharedContext()');
     }
   });
-  // Editor em view-only: força contenteditable=false
-  if(S.sharedContext.permission==='view'){
-    document.querySelectorAll('.rich-editor[contenteditable="true"]').forEach(function(el){el.setAttribute('contenteditable','false');});
+  // View mode: trava efetivamente todos os controles + remove botões de mutação do DOM
+  if(ro){
+    const root=document.querySelector('.editor-shell');
+    if(root){
+      root.querySelectorAll('input, textarea, select').forEach(function(el){
+        try{el.setAttribute('disabled','disabled');el.setAttribute('readonly','readonly');}catch(e){}
+      });
+      root.querySelectorAll('[contenteditable="true"]').forEach(function(el){
+        try{el.setAttribute('contenteditable','false');}catch(e){}
+      });
+      // Remove botões de mutação do DOM (subir/descer/duplicar/remover/+adicionar bloco)
+      root.querySelectorAll('.be-footer-right, .add-block-btn, .be-block-actions').forEach(function(el){el.remove();});
+      root.querySelectorAll('.be-block-footer button').forEach(function(b){
+        const txt=b.textContent.toLowerCase();
+        if(/(subir|descer|duplicar|remover|excluir|salvar)/.test(txt))b.remove();
+      });
+      // Esconde global-toolbar (negrito/itálico/etc.) - já coberto por CSS, garante via remove
+      const tb=root.querySelector('.global-toolbar');if(tb)tb.style.display='none';
+    }
   }
 }
 
 window.exitSharedContext=function(){
   _unsubscribeRealtimeRoteiro();
+  _unsubscribeRealtimeShare();
   S.sharedContext=null;
+  window._phaseC.saveDenied=false;
   _phaseC_applyReadonlyClass(false);
   _phaseC_clearUrlToken();
   S.draft=null;
@@ -3819,37 +3872,85 @@ function _applyRemoteRoteiroUpdate(remoteRow){
   _showCollabPing();
 }
 
+// ── Helpers de readonly e status do save ──
+function _phaseC_isReadOnly(){
+  return !!(S.sharedContext&&S.sharedContext.permission==='view');
+}
+function _phaseC_isSharedEdit(){
+  return !!(S.sharedContext&&S.sharedContext.permission==='edit');
+}
+function _phaseC_setStatus(kind,text){
+  // kind: 'idle' | 'saving' | 'saved' | 'error' | 'denied'
+  if(!S.sharedContext)return;
+  const badge=document.querySelector('.editor-topbar .section-label .share-badge');
+  if(!badge)return;
+  // Mantém base label (somente leitura / colab — edição) e anexa status
+  const base=S.sharedContext.permission==='view'?'somente leitura':'colab — edição';
+  const suffix=text?(' · '+text):'';
+  badge.textContent=base+suffix;
+  badge.classList.remove('is-saving','is-saved','is-error');
+  if(kind==='saving')badge.classList.add('is-saving');
+  else if(kind==='saved')badge.classList.add('is-saved');
+  else if(kind==='error'||kind==='denied')badge.classList.add('is-error');
+}
+
 // ── Save em modo compartilhado (edit) ──
-function _saveSharedRoteiro(){
-  if(!S.sharedContext||S.sharedContext.permission!=='edit')return;
-  clearTimeout(window._phaseC.saveTimer);
-  window._phaseC.saveTimer=setTimeout(async function(){
-    const sb=_phaseC_supabase();if(!sb)return;
-    try{window.collectDOM&&window.collectDOM();}catch(e){}
-    const d=S.draft;if(!d||!d.id)return;
-    const now=Date.now();
-    const blob={
-      title:d.title||'',presenter:d.presenter||'',description:d.description||'',
-      blocks:Array.isArray(d.blocks)?d.blocks:[],
-      versions:Array.isArray(d.versions)?d.versions:[],
-      audioPlayback:d.audioPlayback||1,videoPlayback:d.videoPlayback||1,
-      createdAt:d.createdAt||now,updatedAt:now
-    };
-    try{
-      _syncStart&&_syncStart();
-      const{error}=await sb.from('roteiros').update({title:d.title||'',data:blob,updated_at:new Date(now).toISOString()}).eq('id',d.id);
-      if(error)throw error;
-      window._phaseC.lastApplied=now;
-      _syncOk&&_syncOk();
-    }catch(e){
-      console.warn('saveSharedRoteiro:',e);
+// _saveSharedRoteiroNow: write síncrono (await). Detecta RLS rejeitada (data.length===0).
+async function _saveSharedRoteiroNow(){
+  if(!_phaseC_isSharedEdit())return{ok:false,error:'not-editor'};
+  if(window._phaseC.saveDenied)return{ok:false,error:'denied'};
+  const sb=_phaseC_supabase();if(!sb)return{ok:false,error:'sdk'};
+  try{window.collectDOM&&window.collectDOM();}catch(e){}
+  const d=S.draft;if(!d||!d.id)return{ok:false,error:'no-draft'};
+  const now=Date.now();
+  const blob={
+    title:d.title||'',presenter:d.presenter||'',description:d.description||'',
+    blocks:Array.isArray(d.blocks)?d.blocks:[],
+    versions:Array.isArray(d.versions)?d.versions:[],
+    audioPlayback:d.audioPlayback||1,videoPlayback:d.videoPlayback||1,
+    createdAt:d.createdAt||now,updatedAt:now
+  };
+  _phaseC_setStatus('saving','salvando…');
+  _syncStart&&_syncStart();
+  try{
+    const{data,error}=await sb.from('roteiros')
+      .update({title:d.title||'',data:blob,updated_at:new Date(now).toISOString()})
+      .eq('id',d.id)
+      .select('id');
+    if(error)throw error;
+    if(!data||data.length===0){
+      // RLS bloqueou (nenhuma linha afetada)
+      window._phaseC.saveDenied=true;
+      _phaseC_setStatus('denied','sem permissão');
+      if(window.showToast)window.showToast('Sem permissão para salvar este roteiro.');
       _syncError&&_syncError(true);
+      return{ok:false,error:'rls-denied'};
     }
-  },800);
+    window._phaseC.lastApplied=now;
+    const t=new Date(now);
+    const hh=String(t.getHours()).padStart(2,'0'),mm=String(t.getMinutes()).padStart(2,'0');
+    _phaseC_setStatus('saved','salvo às '+hh+':'+mm);
+    _syncOk&&_syncOk();
+    return{ok:true};
+  }catch(e){
+    console.warn('saveSharedRoteiro:',e);
+    _phaseC_setStatus('error','erro de sincronização');
+    _syncError&&_syncError(true);
+    return{ok:false,error:e.message||'save-failed'};
+  }
+}
+
+// Versão debounced (auto-save de 800ms)
+function _saveSharedRoteiro(){
+  if(!_phaseC_isSharedEdit())return;
+  clearTimeout(window._phaseC.saveTimer);
+  window._phaseC.saveTimer=setTimeout(function(){_saveSharedRoteiroNow();},800);
 }
 
 // Hook de auto-save chamado pelos inputs (quando em sharedContext)
 window._phaseC_autoSave=function(){_saveSharedRoteiro();};
+window._saveSharedRoteiroNow=_saveSharedRoteiroNow;
+window._saveSharedRoteiro=_saveSharedRoteiro;
 
 // ── Modal de compartilhamento ──
 window.openShareModal=async function(roteiroId){
@@ -4007,6 +4108,164 @@ function _phaseC_installEditorWrap(){
   };
 }
 _phaseC_installEditorWrap();
+
+// ── Wraps de mutação + persistência (Phase C) ──
+// Em sharedContext.view: bloqueia tudo + toast "modo somente leitura".
+// Em sharedContext.edit: redireciona persistência para _saveSharedRoteiroNow/_saveSharedRoteiro
+//   e NUNCA toca S.roteiros local nem chama hooks da Fase B.
+function _phaseC_blockedToast(){
+  if(window._phaseC.lastBlockedToast&&Date.now()-window._phaseC.lastBlockedToast<1500)return;
+  window._phaseC.lastBlockedToast=Date.now();
+  if(window.showToast)window.showToast('Modo somente leitura.');
+}
+
+function _phaseC_installMutationWraps(){
+  if(window._phaseC_mutWrapsInstalled)return;
+  // Espera funções existirem
+  const ready=typeof window.persistRoteiro==='function'
+    &&typeof window.saveAndStay==='function'
+    &&typeof window.addBlock==='function'
+    &&typeof window.removeBlock==='function'
+    &&typeof window.moveBlock==='function'
+    &&typeof window.duplicateBlock==='function'
+    &&typeof window.updateSpeaker==='function';
+  if(!ready){setTimeout(_phaseC_installMutationWraps,0);return;}
+  window._phaseC_mutWrapsInstalled=true;
+
+  // persistRoteiro: em sharedContext, NÃO escreve em S.roteiros nem localStorage; vai direto pro Supabase.
+  const _origPersist=window.persistRoteiro;
+  window.persistRoteiro=function(r){
+    if(S.sharedContext){
+      if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+      // Atualiza S.draft.updatedAt sem mexer em S.roteiros
+      if(r)r.updatedAt=Date.now();
+      _saveSharedRoteiroNow();
+      return;
+    }
+    return _origPersist.apply(this,arguments);
+  };
+
+  // saveAndStay: em sharedContext.edit, salva no roteiro do dono via Supabase
+  const _origSaveAndStay=window.saveAndStay;
+  window.saveAndStay=function(){
+    if(S.sharedContext){
+      if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+      try{window.collectDOM&&window.collectDOM();}catch(e){}
+      const d=S.draft;
+      if(!d){return;}
+      if(!d.title||!d.title.trim()){
+        if(window.showToast)window.showToast('Defina o nome do episódio antes de salvar.');
+        const e=document.getElementById('meta-title');
+        if(e){e.focus();e.scrollIntoView({behavior:'smooth',block:'center'});}
+        return;
+      }
+      // Recalcula duração igual o original faz
+      let tot=0;d.blocks.forEach(function(b){if(b.time){const n=parseInt(String(b.time).replace(/\D/g,''));if(!isNaN(n))tot+=n;}});
+      if(tot>0){const m=Math.floor(tot/60),s=tot%60;d.duration='~'+(m>0?m+'m ':'')+s+'s';}
+      _saveSharedRoteiroNow().then(function(res){
+        if(res&&res.ok&&window.showToast)window.showToast('Roteiro salvo!');
+      });
+      return;
+    }
+    return _origSaveAndStay.apply(this,arguments);
+  };
+
+  // addBlock
+  const _origAdd=window.addBlock;
+  window.addBlock=function(){
+    if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+    const out=_origAdd.apply(this,arguments);
+    if(_phaseC_isSharedEdit())_saveSharedRoteiro();
+    return out;
+  };
+  // removeBlock
+  const _origRemove=window.removeBlock;
+  window.removeBlock=function(){
+    if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+    const out=_origRemove.apply(this,arguments);
+    if(_phaseC_isSharedEdit())_saveSharedRoteiro();
+    return out;
+  };
+  // moveBlock
+  const _origMove=window.moveBlock;
+  window.moveBlock=function(){
+    if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+    const out=_origMove.apply(this,arguments);
+    if(_phaseC_isSharedEdit())_saveSharedRoteiro();
+    return out;
+  };
+  // duplicateBlock
+  const _origDup=window.duplicateBlock;
+  window.duplicateBlock=function(){
+    if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+    const out=_origDup.apply(this,arguments);
+    if(_phaseC_isSharedEdit())_saveSharedRoteiro();
+    return out;
+  };
+  // updateSpeaker (personagem do bloco)
+  const _origSpeaker=window.updateSpeaker;
+  window.updateSpeaker=function(){
+    if(_phaseC_isReadOnly()){_phaseC_blockedToast();return;}
+    const out=_origSpeaker.apply(this,arguments);
+    if(_phaseC_isSharedEdit())_saveSharedRoteiro();
+    return out;
+  };
+}
+_phaseC_installMutationWraps();
+
+// ── Bloqueia Cmd/Ctrl+S em modo readonly (capture phase) ──
+document.addEventListener('keydown',function(e){
+  if(!S.sharedContext)return;
+  const isSave=(e.key==='s'||e.key==='S')&&(e.ctrlKey||e.metaKey);
+  if(!isSave)return;
+  if(_phaseC_isReadOnly()){
+    e.preventDefault();e.stopPropagation();
+    _phaseC_blockedToast();
+  }else if(_phaseC_isSharedEdit()){
+    e.preventDefault();e.stopPropagation();
+    window.saveAndStay&&window.saveAndStay();
+  }
+},true);
+
+// ── Realtime na tabela shares: detecta revogação ou mudança de permissão ──
+function _subscribeRealtimeShare(shareId){
+  const sb=_phaseC_supabase();if(!sb||!sb.channel||!shareId)return;
+  _unsubscribeRealtimeShare();
+  try{
+    const ch=sb.channel('share:'+shareId);
+    ch.on('postgres_changes',{event:'UPDATE',schema:'public',table:'shares',filter:'id=eq.'+shareId},function(payload){
+      const row=payload&&payload.new;if(!row||!S.sharedContext)return;
+      const newPerm=row.permission==='edit'?'edit':'view';
+      if(newPerm!==S.sharedContext.permission){
+        S.sharedContext.permission=newPerm;
+        _phaseC_applyReadonlyClass(newPerm==='view');
+        if(newPerm==='view'){
+          // revoga edição em andamento
+          window._phaseC.saveDenied=false;
+          if(window.showToast)window.showToast('Permissão alterada para somente leitura.');
+        }else{
+          window._phaseC.saveDenied=false;
+          if(window.showToast)window.showToast('Permissão alterada para edição.');
+        }
+        try{window.renderEditor&&window.renderEditor();}catch(e){}
+        _phaseC_decorateEditor();
+      }
+    });
+    ch.on('postgres_changes',{event:'DELETE',schema:'public',table:'shares',filter:'id=eq.'+shareId},function(){
+      if(window.showToast)window.showToast('Acesso revogado pelo dono.');
+      window.exitSharedContext&&window.exitSharedContext();
+    });
+    ch.subscribe();
+    window._phaseC.shareChannel=ch;
+  }catch(e){console.warn('subscribe share:',e);}
+}
+function _unsubscribeRealtimeShare(){
+  const sb=_phaseC_supabase();
+  const ch=window._phaseC.shareChannel;
+  if(ch&&sb&&sb.removeChannel){try{sb.removeChannel(ch);}catch(e){}}
+  window._phaseC.shareChannel=null;
+}
+window._unsubscribeRealtimeShare=_unsubscribeRealtimeShare;
 
 
 window.esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')};
@@ -8915,9 +9174,10 @@ render();
         _persistRoteiroFails={};
         _syncSetOffline&&_syncSetOffline(true);
         // limpa contexto de share e realtime
-        try{window._unsubscribeRealtimeRoteiro&&window._unsubscribeRealtimeRoteiro();}catch(e){}
-        if(typeof _unsubscribeRealtimeRoteiro==='function'){try{_unsubscribeRealtimeRoteiro();}catch(e){}}
+        try{if(typeof _unsubscribeRealtimeRoteiro==='function')_unsubscribeRealtimeRoteiro();}catch(e){}
+        try{if(typeof _unsubscribeRealtimeShare==='function')_unsubscribeRealtimeShare();}catch(e){}
         S.sharedContext=null;
+        if(window._phaseC)window._phaseC.saveDenied=false;
         if(document.body)document.body.classList.remove('is-share-readonly');
       }
     });
