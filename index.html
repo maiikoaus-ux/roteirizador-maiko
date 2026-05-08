@@ -2181,6 +2181,208 @@ body.is-share-readonly [contenteditable]::before{opacity:.55}
   #btn-new{display:none}  /* libera espaco; usuario cria roteiro pelo workspace */
   .topbar-logo-sub .beta-tag{margin:0 3px;padding:1px 4px;font-size:7.5px}
 }
+
+/* ============================================================
+   MOBILE-FIRST EDITOR REFACTOR (max-width:900px)
+   - Fix preview-panel cascade hide
+   - Compact editor topbar / actions
+   - Aux toggle (Pomodoro/Estrutura/Stats/Revisao) collapsed by default
+   - Block chips strip for fluid block navigation
+   - Slim global rich-text toolbar
+   - Compact meta-grid, tabs, time-tracker
+   Tudo guardado por @media; desktop intocado.
+   ============================================================ */
+@media (max-width:900px){
+  /* 1) BUG FIX: preview panel must hide on mobile (cascata invertida) */
+  #main.editor-mode .preview-panel,
+  .preview-panel{display:none!important}
+
+  /* 2) EDITOR TOPBAR sticky + compact, single row scroll */
+  #main.editor-mode .editor-panel .editor-topbar{
+    margin-bottom:4px!important;
+    padding:6px 10px 4px!important;
+    position:sticky;top:0;z-index:50;
+    background:rgba(250,250,248,.96);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+    border-bottom:0.5px solid rgba(0,0,0,.07);
+    gap:4px!important;
+    flex-wrap:nowrap!important;
+  }
+  #main.editor-mode .editor-panel .section-label{display:none!important}
+  #main.editor-mode .editor-actions,
+  .editor-actions{
+    flex-wrap:nowrap!important;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    gap:4px!important;
+    width:100%;
+    padding:0!important;
+    scrollbar-width:none;
+    justify-content:flex-start!important;
+  }
+  #main.editor-mode .editor-actions::-webkit-scrollbar,
+  .editor-actions::-webkit-scrollbar{display:none}
+  #main.editor-mode .editor-actions .editor-chrome-btn,
+  .editor-actions .editor-chrome-btn{
+    flex-shrink:0;
+    font-size:11px!important;
+    padding:5px 9px!important;
+    min-height:30px;height:30px;
+    line-height:1;
+    white-space:nowrap;
+    border-radius:7px!important;
+  }
+  /* Salvar fica fixo no fim com leve auto-margin */
+  #main.editor-mode .editor-actions .editor-chrome-btn--primary{
+    margin-left:auto!important;
+    order:99;
+  }
+
+  /* 3) AUX TOGGLE button (Ferramentas) e colapso de painéis auxiliares */
+  [data-aux-toggle]{
+    flex-shrink:0;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  body.is-editor-aux-open [data-aux-toggle]{
+    background:#1a1a18!important;
+    color:#fff!important;
+    border-color:#1a1a18!important;
+  }
+  body:not(.is-editor-aux-open) #sprint-bar,
+  body:not(.is-editor-aux-open) #structure-timeline,
+  body:not(.is-editor-aux-open) #revision-mode-bar,
+  body:not(.is-editor-aux-open) #stats-pill-bar,
+  body:not(.is-editor-aux-open) #dur-progress-wrap{display:none!important}
+  body.is-editor-aux-open #sprint-bar,
+  body.is-editor-aux-open #structure-timeline,
+  body.is-editor-aux-open #revision-mode-bar,
+  body.is-editor-aux-open #stats-pill-bar{
+    margin:4px 8px!important;
+    padding:6px 10px!important;
+    font-size:11px!important;
+  }
+
+  /* 4) BLOCK CHIPS strip — navegacao mobile-only */
+  #block-chips-bar{
+    position:sticky;top:38px;z-index:48;
+    display:flex;
+    gap:5px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:6px 10px;
+    background:rgba(250,250,248,.94);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    border-bottom:0.5px solid rgba(0,0,0,.06);
+    scrollbar-width:none;
+  }
+  #block-chips-bar::-webkit-scrollbar{display:none}
+  .block-chip{
+    flex-shrink:0;
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 9px;
+    border-radius:14px;
+    border:0.5px solid rgba(0,0,0,.12);
+    background:#fff;
+    font-family:var(--mono);
+    font-size:10.5px;font-weight:500;
+    color:var(--text2);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .14s,color .14s,border-color .14s,transform .12s;
+    min-height:24px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .block-chip:active{transform:scale(.96)}
+  .block-chip .phase-dot{width:6px;height:6px;border-radius:50%;background:#ccc;flex-shrink:0}
+  .block-chip .phase-dot.phase-inicio{background:#a7d189}
+  .block-chip .phase-dot.phase-meio{background:#e0b572}
+  .block-chip .phase-dot.phase-fim{background:#c97f7f}
+  .block-chip.active{
+    background:#1a1a18;
+    color:#fff;
+    border-color:#1a1a18;
+  }
+  .block-chip.active .phase-dot{box-shadow:0 0 0 1px rgba(255,255,255,.5)}
+
+  /* 5) GLOBAL TOOLBAR (rich-text) — uma linha rolável, enxuta */
+  #main.editor-mode .global-toolbar,
+  #main.editor-mode #global-toolbar{
+    flex-wrap:nowrap!important;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding:5px 8px!important;
+    gap:4px!important;
+    margin:6px 8px 0!important;
+    min-height:38px;height:38px;
+    align-items:center;
+    scrollbar-width:none;
+    border-radius:9px!important;
+  }
+  #main.editor-mode .global-toolbar::-webkit-scrollbar,
+  #main.editor-mode #global-toolbar::-webkit-scrollbar{display:none}
+  #main.editor-mode .global-toolbar .rt-btn{
+    flex-shrink:0;
+    width:28px;min-width:28px;height:28px;min-height:28px;
+    padding:0!important;
+    font-size:11px!important;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  #main.editor-mode .global-toolbar .rt-divider{flex-shrink:0;margin:0 2px;height:14px}
+  #main.editor-mode .global-toolbar .color-btn{flex-shrink:0;width:18px;height:18px}
+  #main.editor-mode .global-toolbar .rt-color-group{flex-shrink:0;gap:2px}
+  /* Esconde labels e selects de baixa frequencia no mobile */
+  #main.editor-mode .global-toolbar .rt-label,
+  #main.editor-mode .global-toolbar .rt-select,
+  #main.editor-mode .global-toolbar .rt-collapsible{display:none!important}
+  /* "Limpar" perde margin-left:auto pra nao gerar gap gigante na faixa scroll */
+  #main.editor-mode .global-toolbar .rt-btn[title="Limpar formatação"]{margin-left:4px!important}
+
+  /* 6) META-GRID compacto (titulo/apresentador/duracao) */
+  #main.editor-mode .meta-grid{
+    gap:6px 8px!important;
+    padding:10px 12px!important;
+    margin:6px 10px 0!important;
+    border-radius:8px!important;
+    grid-template-columns:1fr!important;
+  }
+  #main.editor-mode .meta-grid .field-label{font-size:9px!important}
+  #main.editor-mode .meta-grid input{
+    padding:7px 10px!important;
+    font-size:13px!important;
+    border-radius:7px!important;
+  }
+
+  /* 7) EDITOR TABS slim (Blocos / Notas) */
+  #main.editor-mode .editor-tabs{
+    padding:4px 12px 0!important;
+    gap:2px!important;
+  }
+  #main.editor-mode .editor-tab{
+    padding:6px 12px!important;
+    font-size:11px!important;
+    border-radius:7px 7px 0 0!important;
+  }
+
+  /* 8) TIME-TRACKER micro-pílula */
+  #main.editor-mode .time-tracker,
+  .time-tracker{
+    font-size:10px!important;
+    padding:5px 10px!important;
+    border-radius:9px!important;
+    margin:6px 10px 8px!important;
+  }
+
+  /* Editor scroll com mais respiro de baixo (clear teclado iOS) */
+  #main.editor-mode .editor-scroll{padding:0 4px 120px!important}
+}
+
+/* Esconde elementos mobile-only no desktop */
+@media (min-width:901px){
+  #block-chips-bar{display:none!important}
+  [data-aux-toggle]{display:none!important}
+}
 </style>
 <script>
 window.APP_LOGO_DATA_URL='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E';
@@ -7777,6 +7979,21 @@ window.renderEditor=function(){
       repBtn.textContent='relatório';repBtn.onclick=()=>window.openReport(null);
       actions.insertBefore(repBtn,actions.firstChild);
     }
+    /* MOBILE: botão "Ferramentas" toggle dos painéis auxiliares (Pomodoro/Estrutura/Stats/Revisão) */
+    if(actions&&!actions.querySelector('[data-aux-toggle]')){
+      const auxBtn=document.createElement('button');auxBtn.type='button';
+      auxBtn.className='editor-chrome-btn';auxBtn.setAttribute('data-aux-toggle','1');
+      auxBtn.title='Mostrar/ocultar Pomodoro, Estrutura, Stats, Revisão';
+      auxBtn.innerHTML='<span style="font-size:11px;margin-right:3px">⚙</span>Ferramentas';
+      auxBtn.onclick=function(){
+        document.body.classList.toggle('is-editor-aux-open');
+      };
+      actions.insertBefore(auxBtn,actions.firstChild);
+    }
+    /* MOBILE: chips horizontais de navegação entre blocos */
+    if(typeof window._renderBlockChips==='function'){window._renderBlockChips();}
+    /* IntersectionObserver: marca chip ativo conforme scroll (sem remount) */
+    if(typeof window._setupBlockChipsObserver==='function'){window._setupBlockChipsObserver();}
     S.draft?.blocks.forEach(b=>{
       window.initAltTabs(b.id);
       const mount=document.getElementById('alt-mount-'+b.id);
@@ -8649,6 +8866,199 @@ window.saveAndStay=function(){
     showToast('✅ Roteiro salvo!');
   }
 };
+
+/* ============================================================
+   MOBILE BLOCK CHIPS — navegação fluida entre blocos no mobile
+   - _renderBlockChips: monta/atualiza incremental a barra <nav id="block-chips-bar">
+   - _setupBlockChipsObserver: IntersectionObserver marca .active sem remount
+   - Hooks em addBlock/removeBlock/duplicateBlock/moveBlock atualizam por delta
+   ============================================================ */
+(function(){
+  function phaseClass(b){
+    if(!b||!b.fase)return 'phase-meio';
+    return 'phase-'+(b.fase==='inicio'?'inicio':(b.fase==='fim'?'fim':'meio'));
+  }
+  function ensureChipsBar(){
+    var panel=document.querySelector('.editor-panel');
+    if(!panel)return null;
+    var bar=document.getElementById('block-chips-bar');
+    if(bar)return bar;
+    bar=document.createElement('nav');
+    bar.id='block-chips-bar';
+    bar.className='no-print';
+    bar.setAttribute('role','tablist');
+    bar.setAttribute('aria-label','Navegação entre blocos');
+    /* Inserir logo após .editor-tabs (se existir) ou após o topbar do editor */
+    var tabs=panel.querySelector('.editor-tabs');
+    if(tabs&&tabs.parentNode){
+      tabs.parentNode.insertBefore(bar,tabs.nextSibling);
+    } else {
+      var topbar=panel.querySelector('.editor-topbar');
+      if(topbar&&topbar.parentNode){
+        topbar.parentNode.insertBefore(bar,topbar.nextSibling);
+      } else {
+        panel.appendChild(bar);
+      }
+    }
+    return bar;
+  }
+  function chipForBlock(b,idx){
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='block-chip';
+    btn.setAttribute('data-block-id',b.id);
+    btn.setAttribute('data-idx',String(idx));
+    btn.setAttribute('role','tab');
+    btn.title='Bloco #'+(idx+1);
+    btn.innerHTML='<span class="phase-dot '+phaseClass(b)+'"></span>#'+(idx+1);
+    btn.addEventListener('click',function(){
+      var card=document.getElementById('be-'+b.id);
+      if(card&&card.scrollIntoView){
+        card.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    });
+    return btn;
+  }
+  window._renderBlockChips=function(){
+    if(!window.S||S.view!=='editor'||!S.draft||!Array.isArray(S.draft.blocks))return;
+    var bar=ensureChipsBar();
+    if(!bar)return;
+    var blocks=S.draft.blocks;
+    var existing=Array.prototype.slice.call(bar.querySelectorAll('.block-chip'));
+    var existingIds=existing.map(function(el){return el.getAttribute('data-block-id');});
+    var targetIds=blocks.map(function(b){return String(b.id);});
+    var sameSet=existingIds.length===targetIds.length&&existingIds.every(function(id,i){return id===targetIds[i];});
+    if(sameSet){
+      /* Apenas atualiza numeração e fase (sem recriar) */
+      blocks.forEach(function(b,i){
+        var el=bar.querySelector('.block-chip[data-block-id="'+b.id+'"]');
+        if(el){
+          el.setAttribute('data-idx',String(i));
+          var dot=el.querySelector('.phase-dot');
+          if(dot)dot.className='phase-dot '+phaseClass(b);
+          var txt=document.createTextNode('#'+(i+1));
+          /* Substitui apenas o texto após o dot */
+          if(el.lastChild&&el.lastChild.nodeType===3){
+            el.lastChild.nodeValue='#'+(i+1);
+          } else {
+            el.appendChild(txt);
+          }
+        }
+      });
+      return;
+    }
+    /* Reconcilia DOM por id (preserva nodes que ainda existem) */
+    var byId={};
+    existing.forEach(function(el){byId[el.getAttribute('data-block-id')]=el;});
+    /* Remove chips que sumiram */
+    existing.forEach(function(el){
+      var id=el.getAttribute('data-block-id');
+      if(targetIds.indexOf(id)<0&&el.parentNode)el.parentNode.removeChild(el);
+    });
+    /* Insere/move chips na ordem correta */
+    var lastNode=null;
+    blocks.forEach(function(b,i){
+      var el=byId[String(b.id)];
+      if(!el){
+        el=chipForBlock(b,i);
+      } else {
+        el.setAttribute('data-idx',String(i));
+        var dot=el.querySelector('.phase-dot');
+        if(dot)dot.className='phase-dot '+phaseClass(b);
+        if(el.lastChild&&el.lastChild.nodeType===3){
+          el.lastChild.nodeValue='#'+(i+1);
+        }
+      }
+      if(lastNode){
+        if(lastNode.nextSibling!==el)bar.insertBefore(el,lastNode.nextSibling);
+      } else {
+        if(bar.firstChild!==el)bar.insertBefore(el,bar.firstChild);
+      }
+      lastNode=el;
+    });
+    /* Mantém o ativo após mutação */
+    if(window._lastActiveChipId){
+      var act=bar.querySelector('.block-chip[data-block-id="'+window._lastActiveChipId+'"]');
+      bar.querySelectorAll('.block-chip.active').forEach(function(c){c.classList.remove('active');});
+      if(act)act.classList.add('active');
+    }
+  };
+  window._setupBlockChipsObserver=function(){
+    /* Desconecta observer antigo se houver */
+    if(window._blockChipsObserver){
+      try{window._blockChipsObserver.disconnect();}catch(e){}
+      window._blockChipsObserver=null;
+    }
+    /* Só ativa em viewport mobile (evita custo no desktop) */
+    if(window.matchMedia&&!window.matchMedia('(max-width:900px)').matches)return;
+    var bar=document.getElementById('block-chips-bar');
+    if(!bar)return;
+    var cards=document.querySelectorAll('#blocks-container .be-card');
+    if(!cards.length)return;
+    var visibility={};
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var id=en.target.id&&en.target.id.indexOf('be-')===0?en.target.id.slice(3):null;
+        if(!id)return;
+        visibility[id]=en.isIntersecting?en.intersectionRatio:0;
+      });
+      /* Encontra o bloco com maior visibilidade */
+      var bestId=null,bestRatio=0;
+      Object.keys(visibility).forEach(function(id){
+        if(visibility[id]>bestRatio){bestRatio=visibility[id];bestId=id;}
+      });
+      if(bestId){
+        window._lastActiveChipId=bestId;
+        var bar2=document.getElementById('block-chips-bar');
+        if(!bar2)return;
+        bar2.querySelectorAll('.block-chip.active').forEach(function(c){c.classList.remove('active');});
+        var act=bar2.querySelector('.block-chip[data-block-id="'+bestId+'"]');
+        if(act){
+          act.classList.add('active');
+          /* Auto-scroll horizontal para o chip ativo continuar visível */
+          if(act.scrollIntoView){
+            try{act.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}catch(e){}
+          }
+        }
+      }
+    },{
+      root:null,
+      rootMargin:'-30% 0px -50% 0px',
+      threshold:[0,0.1,0.25,0.5,0.75,1]
+    });
+    cards.forEach(function(c){obs.observe(c);});
+    window._blockChipsObserver=obs;
+  };
+  /* Wrap das mutações de bloco para sincronizar chips de forma incremental */
+  function wrapMut(name){
+    var orig=window[name];
+    if(typeof orig!=='function')return;
+    if(orig.__chipsWrapped)return;
+    var wrapped=function(){
+      var ret=orig.apply(this,arguments);
+      try{
+        if(typeof window._renderBlockChips==='function')window._renderBlockChips();
+        /* Reobserve após mutação (cards podem ter sido criados/removidos) */
+        setTimeout(function(){
+          if(typeof window._setupBlockChipsObserver==='function')window._setupBlockChipsObserver();
+        },50);
+      }catch(e){}
+      return ret;
+    };
+    wrapped.__chipsWrapped=true;
+    window[name]=wrapped;
+  }
+  /* Espera próximo tick pra garantir que addBlock/removeBlock/etc. já estão definidos */
+  function applyWraps(){
+    ['addBlock','removeBlock','duplicateBlock','moveBlock'].forEach(wrapMut);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',applyWraps);
+  } else {
+    /* Garante que executa depois das definições inline */
+    setTimeout(applyWraps,0);
+  }
+})();
 
 window.duplicateBlock=function(id){
   if(!S.draft||!Array.isArray(S.draft.blocks))return;
