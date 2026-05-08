@@ -2086,6 +2086,101 @@ body.is-share-readonly [contenteditable]::before{opacity:.55}
 /* mini avatar usado em pills/tags de colab */
 .le-avatar{width:14px;height:14px;border-radius:50%;flex-shrink:0;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:#fff;font-family:var(--font);letter-spacing:.02em}
 .le-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* ── MOBILE: sidebar virou drawer + ajustes responsivos ─── */
+.sidebar-backdrop{display:none}
+.topbar-burger{display:none}
+
+@media (max-width:900px){
+  /* Sidebar fixed overlay sem empurrar conteudo */
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;height:100vh;height:100dvh;
+    width:240px!important;max-width:80vw;
+    transform:translateX(-100%);
+    transition:transform .22s ease,box-shadow .22s ease;
+    z-index:300;
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .sidebar.is-pinned{transform:translateX(0);box-shadow:6px 0 24px rgba(0,0,0,.18)}
+  /* Auto-expand de hover desativado em mobile (ja era pelo media de pointer/hover acima) */
+  .sidebar:hover{box-shadow:0 0 0 rgba(0,0,0,0)}
+
+  /* Labels e elementos do estado expandido sempre que pinned no mobile */
+  .sidebar.is-pinned .sb-app-title,
+  .sidebar.is-pinned .sb-btn-label,
+  .sidebar.is-pinned .sb-avatar-info,
+  .sidebar.is-pinned .sb-group-label{opacity:1!important;transform:translateX(0)!important;height:auto!important}
+
+  /* Backdrop overlay */
+  .sidebar-backdrop{
+    display:block;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.4);
+    z-index:299;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  body.is-sb-open .sidebar-backdrop{opacity:1;pointer-events:auto}
+
+  /* Hamburger button */
+  .topbar-burger{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:36px;height:36px;
+    border:none;background:transparent;border-radius:8px;
+    cursor:pointer;flex-shrink:0;
+    color:var(--text);padding:0;margin-right:2px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .topbar-burger:active{background:var(--bg2)}
+  .topbar-burger svg{width:20px;height:20px;display:block}
+
+  /* Topbar mais enxuta no mobile */
+  .topbar{padding:8px 12px;padding-top:max(8px,env(safe-area-inset-top));gap:6px}
+  .topbar-inspire{display:none}
+  .topbar-mid{gap:6px;min-width:0}
+  .topbar-logo-name{font-size:13px}
+  .topbar-logo-sub{font-size:8px;letter-spacing:.08em;margin-top:2px}
+  #btn-new{font-size:11px;padding:6px 10px;white-space:nowrap}
+
+  /* Editor: actions ficam compactas e podem quebrar em 2 linhas */
+  #main.editor-mode .editor-actions,
+  .editor-actions{
+    flex-wrap:wrap;
+    gap:5px 6px;
+    justify-content:flex-end;
+  }
+  #main.editor-mode .editor-actions .editor-chrome-btn,
+  .editor-actions .editor-chrome-btn{font-size:12px;padding:6px 10px}
+  .editor-topbar{flex-wrap:wrap;align-items:center;gap:6px;padding:10px 14px 0!important}
+  .editor-topbar .section-label{display:none}
+
+  /* Docs toolbar: cada linha rola horizontal sem quebrar (muitos controles) */
+  .docs-tb-row{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .docs-tb-row::-webkit-scrollbar{height:4px}
+
+  /* Beat Board: toolbar mantem wrap mas com max-width pra nao vazar do canvas */
+  .bb-toolbar{
+    max-width:calc(100% - 28px);
+    gap:5px 6px;
+  }
+  .bb-toolbar .bb-btn{flex-shrink:0;white-space:nowrap;font-size:12px}
+
+  /* Workspace header de cada tab: padding mais enxuto */
+  .ws-header{padding:14px 16px;gap:8px}
+  .ws-header--workspace{padding:12px 14px;grid-template-columns:1fr;gap:10px 8px}
+  .ws-app-name{font-size:18px}
+  .ws-app-sub{font-size:9px}
+  .ws-header-btn-row{flex-wrap:wrap;gap:6px}
+  .ws-import-btn,.ws-new-btn{font-size:12px;padding:8px 12px}
+}
+
+@media (max-width:480px){
+  #btn-new{display:none}  /* libera espaco; usuario cria roteiro pelo workspace */
+  .topbar-logo-sub .beta-tag{margin:0 3px;padding:1px 4px;font-size:7.5px}
+}
 </style>
 <script>
 window.APP_LOGO_DATA_URL='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E';
@@ -2190,8 +2285,12 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
   </div>
 </aside>
 
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="window.toggleSidebarPin&&window.toggleSidebarPin()" aria-hidden="true"></div>
 <div class="app-content" id="app-content">
   <div class="topbar" id="topbar">
+    <button class="topbar-burger" type="button" id="topbar-burger" aria-label="Abrir menu" onclick="window.toggleSidebarPin&&window.toggleSidebarPin()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3.5 6h13M3.5 10h13M3.5 14h13"/></svg>
+    </button>
     <button class="btn btn-sm btn-ghost hidden" id="btn-back">← workspace</button>
     <div class="topbar-mid">
       <div class="topbar-logo">
@@ -8617,14 +8716,22 @@ if(!window._editorShortcutsBound){
   });
 }
 
-// Global: alterna pin da sidebar com Cmd/Ctrl + \
+// Global: alterna pin da sidebar com Cmd/Ctrl + \ (e tap no logo / hamburger no mobile)
 if(!window._sidebarPinBound){
   window._sidebarPinBound=true;
-  window.toggleSidebarPin=function(){
+  window._isMobileNarrow=function(){return window.matchMedia&&window.matchMedia('(max-width:900px)').matches;};
+  window.toggleSidebarPin=function(force){
     const sb=document.getElementById('sidebar');
     if(!sb)return;
-    sb.classList.toggle('is-pinned');
-    if(window.showToast)window.showToast(sb.classList.contains('is-pinned')?'Sidebar fixada':'Sidebar liberada');
+    const wantOn=(typeof force==='boolean')?force:!sb.classList.contains('is-pinned');
+    sb.classList.toggle('is-pinned',wantOn);
+    document.body.classList.toggle('is-sb-open',wantOn);
+    if(!window._isMobileNarrow()&&window.showToast){
+      window.showToast(wantOn?'Sidebar fixada':'Sidebar liberada');
+    }
+  };
+  window._closeSidebarOnMobile=function(){
+    if(window._isMobileNarrow())window.toggleSidebarPin(false);
   };
   document.addEventListener('keydown',function(e){
     const tgt=e.target;
@@ -8634,6 +8741,27 @@ if(!window._sidebarPinBound){
     if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key==='\\'){
       e.preventDefault();
       window.toggleSidebarPin();
+    }
+    if(e.key==='Escape'&&document.body.classList.contains('is-sb-open')){
+      window.toggleSidebarPin(false);
+    }
+  });
+  // Fechar drawer ao navegar (clicar nos itens do menu) no mobile
+  document.addEventListener('click',function(e){
+    if(!window._isMobileNarrow())return;
+    if(!document.body.classList.contains('is-sb-open'))return;
+    const t=e.target;
+    if(!t||!t.closest)return;
+    const inSidebar=t.closest('#sidebar');
+    if(!inSidebar)return;
+    // Se clicou num botao/avatar dentro da sidebar, fecha o drawer
+    const navBtn=t.closest('.sb-btn, .sb-avatar-btn');
+    if(navBtn)setTimeout(function(){window._closeSidebarOnMobile&&window._closeSidebarOnMobile();},120);
+  });
+  // Quando mudar de orientacao/tamanho, garante consistencia do estado
+  window.addEventListener('resize',function(){
+    if(!window._isMobileNarrow()){
+      document.body.classList.remove('is-sb-open');
     }
   });
 }
