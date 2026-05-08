@@ -399,20 +399,36 @@ body{margin:0}
 .app-content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;height:100%}
 .app-content .main{flex:1;overflow:auto;position:relative;min-height:0}
 
-/* ── SIDEBAR ─────────────────────────────────────────────────── */
-.sidebar{width:52px;flex-shrink:0;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;z-index:200;overflow:hidden;gap:2px}
-.sb-logo{height:48px;display:flex;align-items:center;justify-content:center;border-bottom:0.5px solid var(--border);flex-shrink:0}
-.sb-logo-mark{width:22px;height:22px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--text);border:0.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* ── SIDEBAR (premium · expansive on hover) ─────────────────── */
+.sidebar{width:54px;flex-shrink:0;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;z-index:200;overflow:hidden;gap:2px;transition:width .18s ease,box-shadow .18s ease;position:relative;will-change:width}
+.sidebar:hover,.sidebar.is-pinned{width:200px;box-shadow:2px 0 14px rgba(0,0,0,.05)}
+
+.sb-logo{height:54px;display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:0 12px;border-bottom:0.5px solid var(--border);flex-shrink:0;overflow:hidden}
+.sb-logo-mark{width:30px;height:30px;border-radius:9px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--text);border:0.5px solid rgba(0,0,0,.12);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .sb-logo-mark img,.ws-logo-mark img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
-.sb-group{display:flex;flex-direction:column;padding:4px 0;gap:1px}
-.sb-group+.sb-group{border-top:0.5px solid var(--border);margin-top:2px;padding-top:6px}
-.sb-btn{width:36px;height:36px;margin:0 auto;border-radius:8px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text2);transition:background .12s,color .12s;position:relative}
+.sb-app-title{font-family:var(--font);font-size:14px;font-weight:650;letter-spacing:-.015em;color:var(--text);white-space:nowrap;opacity:0;transform:translateX(-4px);transition:opacity .14s,transform .14s;pointer-events:none}
+.sidebar:hover .sb-app-title,.sidebar.is-pinned .sb-app-title{opacity:1;transform:translateX(0)}
+
+.sb-group{display:flex;flex-direction:column;padding:7px 8px;gap:1px}
+.sb-group+.sb-group{border-top:0.5px solid var(--border);margin-top:2px;padding-top:9px}
+.sb-group-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:0 9px 4px;white-space:nowrap;opacity:0;height:0;overflow:hidden;transition:opacity .14s,height .14s,padding .14s}
+.sidebar:hover .sb-group-label,.sidebar.is-pinned .sb-group-label{opacity:1;height:18px;padding:0 9px 4px}
+
+.sb-btn{width:100%;height:38px;padding:0 9px;border-radius:9px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:flex-start;gap:12px;font-family:var(--font);font-size:13px;color:var(--text2);transition:background .12s,color .12s;position:relative;text-align:left}
 .sb-btn:hover{background:var(--bg2);color:var(--text)}
-.sb-btn.active{background:var(--text);color:var(--bg)}
-.sb-btn .sb-beat-ico{display:block;opacity:.92}
+.sb-btn.active{background:transparent;color:var(--text);font-weight:550}
+.sb-btn.active::before{content:"";position:absolute;left:-8px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--text);transition:left .14s}
+.sidebar:hover .sb-btn.active::before,.sidebar.is-pinned .sb-btn.active::before{left:-2px}
+.sb-btn-ico{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:inherit;opacity:.85;transition:opacity .12s}
+.sb-btn:hover .sb-btn-ico,.sb-btn.active .sb-btn-ico{opacity:1}
+.sb-btn-ico svg{width:18px;height:18px;display:block}
+.sb-btn-label{font-size:12.5px;font-weight:500;letter-spacing:-.005em;color:inherit;white-space:nowrap;opacity:0;transform:translateX(-4px);transition:opacity .14s,transform .14s;pointer-events:none}
+.sidebar:hover .sb-btn-label,.sidebar.is-pinned .sb-btn-label{opacity:1;transform:translateX(0)}
 .sb-btn[title]:hover::after{content:attr(title);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text);color:var(--bg);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:9.5px;white-space:nowrap;z-index:9999;pointer-events:none;letter-spacing:.04em}
+.sidebar:hover .sb-btn[title]:hover::after,.sidebar.is-pinned .sb-btn[title]:hover::after{display:none}
+
 .sb-spacer{flex:1}
-.sb-bottom{padding:6px 0 8px;border-top:0.5px solid var(--border)}
+.sb-bottom{padding:8px 8px 10px;border-top:0.5px solid var(--border);display:flex;flex-direction:column;gap:1px}
 
 /* ── BREADCRUMB ──────────────────────────────────────────────── */
 .breadcrumb-bar{display:flex;align-items:center;padding:0 16px;height:0;overflow:hidden;background:var(--bg);border-bottom:0.5px solid transparent;transition:height .18s,border-color .18s;flex-shrink:0}
@@ -1265,11 +1281,11 @@ body.typewriter-on #main.editor-mode .editor-shell .rich-editor:focus{
 /* HEADER */
 .ws-header{display:flex;align-items:center;gap:12px;padding:18px 28px;border-bottom:0.5px solid var(--border);flex-wrap:nowrap;background:rgba(255,255,255,.88);flex-shrink:0;position:sticky;top:0;z-index:8;backdrop-filter:blur(10px)}
 .ws-header--workspace{display:grid;grid-template-columns:minmax(140px,1fr) auto;gap:12px 16px;align-items:center;padding:15px 26px 16px}
-.ws-header-left{display:flex;align-items:center;gap:10px;min-width:0}
+.ws-header-left{display:flex;align-items:center;gap:0;min-width:0}
 .ws-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
 .ws-logo-mark{width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--text);border:0.5px solid rgba(0,0,0,.1);box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.ws-app-name{font-size:17px;font-weight:650;line-height:1.12;letter-spacing:-.025em;white-space:nowrap;color:#141412}
-.ws-app-sub{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#6a6a64;margin-top:2px;font-weight:500}
+.ws-app-name{font-size:19px;font-weight:650;line-height:1.1;letter-spacing:-.025em;white-space:nowrap;color:#141412}
+.ws-app-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6a6a64;margin-top:3px;font-weight:500}
 .ws-header-stats{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;align-items:center;justify-content:flex-end;max-width:100%}
 .ws-stat-pill{display:flex;flex-direction:column;align-items:center;padding:6px 11px 7px;background:#fff;border:0.5px solid rgba(0,0,0,.1);border-radius:10px;min-width:52px;box-shadow:0 2px 8px rgba(0,0,0,.045)}
 .ws-stat-n{font-size:17px;font-weight:700;line-height:1;font-family:var(--mono);color:#121210}
@@ -1466,32 +1482,36 @@ body.typewriter-on #main.editor-mode .editor-shell .rich-editor:focus{
   min-width:0;
 }
 .wc-card--board .wc-card-footer{padding:7px 8px 8px;flex-shrink:0;border-top:0.5px solid rgba(92,68,48,.14);margin:0;background:#fff;overflow:visible;min-width:0;box-sizing:border-box;display:block}
-.wc-card--board .wc-card-actions{display:grid;grid-template-columns:1.4fr .55fr .55fr .55fr .55fr 1fr;column-gap:4px;row-gap:5px;width:100%;min-width:0;align-items:stretch}
+.wc-card--board .wc-card-actions{display:grid;grid-template-columns:repeat(6,1fr);column-gap:4px;row-gap:5px;width:100%;min-width:0;align-items:stretch}
 .wc-card--board .wc-card-actions .wc-act,
 .wc-card--board .wc-card-actions .wc-act-icon{
   font-family:var(--font);
-  font-size:9px;
+  font-size:11px;
   font-weight:500;
-  padding:6px 3px;
+  padding:0 4px;
   line-height:1.15;
-  border-radius:6px;
+  border-radius:7px;
   border:0.5px solid rgba(0,0,0,.1);
   background:var(--bg2);
   color:#1a1a18;
-  white-space:normal;
+  white-space:nowrap;
   text-align:center;
   box-sizing:border-box;
   min-width:0;
   width:100%;
+  height:32px;
   justify-self:stretch;
   align-self:stretch;
   display:inline-flex;
   align-items:center;
   justify-content:center;
+  transition:background .12s,border-color .12s,color .12s;
 }
 .wc-card--board .wc-card-actions .wc-act:hover,
-.wc-card--board .wc-card-actions .wc-act-icon:hover{background:#eceae4;border-color:rgba(0,0,0,.12)}
-.wc-card--board .wc-card-actions .wc-act-icon{font-size:9px;font-weight:600}
+.wc-card--board .wc-card-actions .wc-act-icon:hover{background:#eceae4;border-color:rgba(0,0,0,.18)}
+.wc-card--board .wc-card-actions .wc-act-icon{padding:0;color:#3a3a36}
+.wc-card--board .wc-card-actions .wc-act-icon svg{width:16px;height:16px;display:block;flex-shrink:0}
+.wc-card--board .wc-card-actions .wc-act-icon:hover{color:#141412}
 .wc-card--board .wc-card-actions .wc-act-del:hover{background:#fce8e8;color:#a32d2d;border-color:#e09090}
 .wc-card--board .wc-phasebar{margin:0;flex-shrink:0;height:4px;gap:2px;border-radius:3px;background:rgba(0,0,0,.05);padding:1px;box-sizing:border-box}
 .wc-card--board .wc-phasebar .wc-phase-seg{border-radius:2px;min-width:2px}
@@ -2013,10 +2033,16 @@ body.is-share-readonly [contenteditable]::before{opacity:.55}
 .wc-act-share:hover{background:#eff6ff}
 
 /* === PROFILE / AVATAR === */
-.sb-avatar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:0.5px solid var(--border);background:var(--bg);cursor:pointer;padding:0;margin:6px auto;overflow:hidden;transition:transform .12s,box-shadow .12s,border-color .12s}
-.sb-avatar-btn:hover{border-color:var(--text2);transform:scale(1.06);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.sb-avatar-btn{display:flex;align-items:center;justify-content:flex-start;gap:11px;width:100%;height:46px;padding:0 6px;border:none;border-radius:10px;background:transparent;cursor:pointer;margin:0 0 4px;overflow:hidden;transition:background .12s;font-family:var(--font);text-align:left}
+.sb-avatar-btn:hover{background:var(--bg2)}
+.sb-avatar-circle{width:34px;height:34px;border-radius:50%;border:0.5px solid var(--border);background:var(--bg);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .12s}
+.sb-avatar-btn:hover .sb-avatar-circle{border-color:var(--text2)}
 .sb-avatar-btn img{width:100%;height:100%;object-fit:cover;display:block}
 .sb-avatar-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
+.sb-avatar-info{display:flex;flex-direction:column;min-width:0;flex:1;text-align:left;opacity:0;transform:translateX(-4px);transition:opacity .14s,transform .14s;pointer-events:none}
+.sidebar:hover .sb-avatar-info,.sidebar.is-pinned .sb-avatar-info{opacity:1;transform:translateX(0)}
+.sb-avatar-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;letter-spacing:-.005em}
+.sb-avatar-email{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;margin-top:2px;font-family:var(--mono);letter-spacing:.02em}
 
 .profile-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px}
 .profile-modal{background:var(--bg);border:0.5px solid var(--border);border-radius:14px;padding:24px 24px 20px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;font-family:var(--font)}
@@ -2083,25 +2109,61 @@ window.applyAppLogoDataUrl=function(u){
 <div class="app-shell" id="app-shell">
 
 <aside class="sidebar" id="sidebar">
-  <div class="sb-logo"><div class="sb-logo-mark"><img data-app-logo="1" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E" width="22" height="22" alt="Maiko Costa"></div></div>
+  <div class="sb-logo">
+    <div class="sb-logo-mark"><img data-app-logo="1" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E" width="30" height="30" alt="Roteirizador"></div>
+    <span class="sb-app-title">Roteirizador</span>
+  </div>
   <div class="sb-group">
-    <button class="sb-btn active" id="sb-v-trello" data-wstab="roteiros" title="Meus Roteiros" onclick="goTrello()">&#x2261;</button>
-    <button class="sb-btn" id="sb-v-docs" data-wstab="docs" title="Docs" onclick="window.openDocs()"><svg class="sb-docs-ico" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M5 2.5h5.2L14 6.3V15.5H5V2.5z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/><path d="M10.2 2.5V6H14" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/><path d="M6.5 9.5h5M6.5 12h5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg></button>
-    <button class="sb-btn" id="sb-v-beat" data-wstab="beatboard" title="Beat Board" onclick="window.openBeatBoard()"><svg class="sb-beat-ico" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2" y="10" width="2.5" height="6" rx="0.5" fill="currentColor"/><rect x="6.25" y="6" width="2.5" height="10" rx="0.5" fill="currentColor"/><rect x="10.5" y="3" width="2.5" height="13" rx="0.5" fill="currentColor"/><rect x="14.75" y="8" width="2.5" height="8" rx="0.5" fill="currentColor"/></svg></button>
+    <span class="sb-group-label">Workspace</span>
+    <button class="sb-btn active" id="sb-v-trello" data-wstab="roteiros" title="Meus Roteiros" aria-label="Meus Roteiros" onclick="goTrello()">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 3.5h7l3 3v10a.5.5 0 0 1-.5.5H5.5a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z"/><path d="M12.5 3.5V7H16"/><path d="M7.5 10h5M7.5 12.5h5M7.5 15h3"/></svg></span>
+      <span class="sb-btn-label">Roteiros</span>
+    </button>
+    <button class="sb-btn" id="sb-v-docs" data-wstab="docs" title="Docs" aria-label="Docs" onclick="window.openDocs()">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3h6.6a1 1 0 0 1 .7.3l3.4 3.4c.2.2.3.4.3.7V15.5A1.5 1.5 0 0 1 14.5 17h-9A1.5 1.5 0 0 1 4 15.5z"/><path d="M12 3v3.5A.5.5 0 0 0 12.5 7H16"/><path d="M7 11h6M7 13.5h6M7 8.5h3"/></svg></span>
+      <span class="sb-btn-label">Docs</span>
+    </button>
+    <button class="sb-btn" id="sb-v-beat" data-wstab="beatboard" title="Beat Board" aria-label="Beat Board" onclick="window.openBeatBoard()">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.25" y="11" width="2.6" height="5.5" rx="1"/><rect x="7.6" y="7" width="2.6" height="9.5" rx="1"/><rect x="11.95" y="3.5" width="2.6" height="13" rx="1"/><rect x="16.3" y="9" width="2.6" height="7.5" rx="1" transform="translate(-3 0)"/></svg></span>
+      <span class="sb-btn-label">Beat Board</span>
+    </button>
   </div>
   <div class="sb-group" id="sb-cvtools" style="display:none">
-    <button class="sb-btn" id="sb-t-select"  data-tool="select"  title="Selecionar"  onclick="cvSetTool('select')">&#x2196;</button>
-    <button class="sb-btn" id="sb-t-note"    data-tool="note"    title="Nota"        onclick="cvSetTool('note')">&#x1F4DD;</button>
-    <button class="sb-btn" id="sb-t-board"   data-tool="board"   title="Novo Board"  onclick="cvSetTool('board')">&#x25A1;</button>
-    <button class="sb-btn" id="sb-t-roteiro" data-tool="roteiro" title="Novo Roteiro" onclick="cvSetTool('roteiro')">&#x1F4CB;</button>
+    <span class="sb-group-label">Ferramentas</span>
+    <button class="sb-btn" id="sb-t-select"  data-tool="select"  title="Selecionar"  aria-label="Selecionar"  onclick="cvSetTool('select')">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3.5 5 14.5l3-2.6 2 4.4 1.7-.8-2-4.3 4-.4z"/></svg></span>
+      <span class="sb-btn-label">Selecionar</span>
+    </button>
+    <button class="sb-btn" id="sb-t-note"    data-tool="note"    title="Nota"        aria-label="Nota"        onclick="cvSetTool('note')">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a1 1 0 0 1 1-1h7l4 4v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M11.5 4v3.5H15"/></svg></span>
+      <span class="sb-btn-label">Nota</span>
+    </button>
+    <button class="sb-btn" id="sb-t-board"   data-tool="board"   title="Novo Board"  aria-label="Novo Board"  onclick="cvSetTool('board')">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="13" height="11" rx="1.5"/><path d="M3.5 8h13"/></svg></span>
+      <span class="sb-btn-label">Novo Board</span>
+    </button>
+    <button class="sb-btn" id="sb-t-roteiro" data-tool="roteiro" title="Novo Roteiro" aria-label="Novo Roteiro" onclick="cvSetTool('roteiro')">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 3.5h9v13h-9z"/><path d="M8 6h4M8 9h4M8 12h3"/></svg></span>
+      <span class="sb-btn-label">Novo Roteiro</span>
+    </button>
   </div>
   <div class="sb-spacer"></div>
   <div class="sb-bottom">
     <button class="sb-avatar-btn" id="sb-avatar-btn" title="Meu perfil" onclick="window.openProfileModal&&window.openProfileModal()" aria-label="Abrir perfil">
-      <span class="sb-avatar-fallback" id="sb-avatar-fallback" style="background:#888">·</span>
+      <span class="sb-avatar-circle"><span class="sb-avatar-fallback" id="sb-avatar-fallback" style="background:#888">·</span></span>
+      <span class="sb-avatar-info">
+        <span class="sb-avatar-name" id="sb-avatar-name">Convidado</span>
+        <span class="sb-avatar-email" id="sb-avatar-email">não autenticado</span>
+      </span>
     </button>
-    <button class="sb-btn" title="Configurar IA" onclick="openApiKeyModal()">&#x1F511;</button>
-    <button class="sb-btn" title="Sair da conta" onclick="window.authSignOut()">&#x23FB;</button>
+    <button class="sb-btn" title="Configurar IA" aria-label="Configurar IA" onclick="openApiKeyModal()">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.25" cy="10" r="3.25"/><path d="m10.5 10 6 0"/><path d="M14 10v2.5"/><path d="M16.5 10v3"/></svg></span>
+      <span class="sb-btn-label">Configurar IA</span>
+    </button>
+    <button class="sb-btn" title="Sair da conta" aria-label="Sair da conta" onclick="window.authSignOut()">
+      <span class="sb-btn-ico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 13.5v2A1.5 1.5 0 0 1 11 17H5.5A1.5 1.5 0 0 1 4 15.5v-11A1.5 1.5 0 0 1 5.5 3H11a1.5 1.5 0 0 1 1.5 1.5v2"/><path d="M9 10h7.5"/><path d="m14 7.5 2.5 2.5L14 12.5"/></svg></span>
+      <span class="sb-btn-label">Sair</span>
+    </button>
     <div class="sb-sync is-offline" id="sb-sync" title="Sem sessão" aria-live="polite"><span class="sync-dot"></span></div>
   </div>
 </aside>
@@ -2111,7 +2173,7 @@ window.applyAppLogoDataUrl=function(u){
     <button class="btn btn-sm btn-ghost hidden" id="btn-back">← workspace</button>
     <div class="topbar-mid">
       <div class="topbar-logo">
-        <span class="topbar-logo-name">Roteirizador Maiko Costa</span>
+        <span class="topbar-logo-name">Roteirizador</span>
         <span class="topbar-logo-sub" id="topbar-sub">v1.15 · workspace</span>
       </div>
       <p class="topbar-inspire" id="topbar-inspire" role="note" aria-live="polite"></p>
@@ -4129,17 +4191,28 @@ function _phaseC_renderMiniAvatarHTML(editor){
 
 window._refreshSidebarAvatar=function(){
   const btn=document.getElementById('sb-avatar-btn');
-  const u=_phaseC_currentUser();
   if(!btn)return;
+  const u=_phaseC_currentUser();
+  let circle=btn.querySelector('.sb-avatar-circle');
+  let info=btn.querySelector('.sb-avatar-info');
+  if(!circle){
+    btn.innerHTML='<span class="sb-avatar-circle"></span><span class="sb-avatar-info"><span class="sb-avatar-name" id="sb-avatar-name"></span><span class="sb-avatar-email" id="sb-avatar-email"></span></span>';
+    circle=btn.querySelector('.sb-avatar-circle');
+    info=btn.querySelector('.sb-avatar-info');
+  }
+  const nameEl=btn.querySelector('.sb-avatar-name');
+  const emailEl=btn.querySelector('.sb-avatar-email');
   if(u&&u.avatar_url){
-    btn.innerHTML='<img src="'+window.esc(u.avatar_url+'?v='+(u._cb||''))+'" alt="" />';
+    circle.innerHTML='<img src="'+window.esc(u.avatar_url+'?v='+(u._cb||''))+'" alt="" />';
   }else if(u){
     const color=_phaseC_userColor(u.id);
     const inits=_phaseC_initials(u.name||u.email||'');
-    btn.innerHTML='<span class="sb-avatar-fallback" style="background:'+color+'">'+window.esc(inits)+'</span>';
+    circle.innerHTML='<span class="sb-avatar-fallback" style="background:'+color+'">'+window.esc(inits)+'</span>';
   }else{
-    btn.innerHTML='<span class="sb-avatar-fallback" style="background:#888">·</span>';
+    circle.innerHTML='<span class="sb-avatar-fallback" style="background:#888">·</span>';
   }
+  if(nameEl)nameEl.textContent=u?(u.name||(u.email?u.email.split('@')[0]:'Usuário')):'Convidado';
+  if(emailEl)emailEl.textContent=u?(u.email||''):'não autenticado';
 };
 
 // ── Modal de perfil ──
@@ -6301,7 +6374,7 @@ window.renderDocsWorkspace=function(){
   const listIds=filtered.map(function(d){return d.id;});
   if(!ids.length){
     return'<div class="workspace-v7 docs-app">'+
-      '<header class="ws-header ws-header--workspace"><div class="ws-header-left"><div class="ws-logo-mark"><img data-app-logo="1" src="'+window.APP_LOGO_DATA_URL+'" width="32" height="32" alt="Maiko Costa"></div><div><h1 class="ws-app-name">Roteirizador</h1><p class="ws-app-sub">Maiko Costa · Docs</p></div></div></header>'+
+      '<header class="ws-header ws-header--workspace"><div class="ws-header-left"><div><h1 class="ws-app-name">Workspace</h1><p class="ws-app-sub">Roteirizador · Docs</p></div></div></header>'+
       '<div class="docs-empty"><h2>Docs</h2><p>Escreva rascunhos, notas e roteiros longos com formatação. Depois, gere blocos de roteiro a partir do texto.</p>'+
       '<button type="button" class="btn btn-primary" onclick="window.docsNewDoc()">+ Criar primeiro documento</button></div></div>';
   }
@@ -6426,7 +6499,7 @@ window.renderDocsWorkspace=function(){
       '<button type="button" class="btn btn-primary" onclick="window.docsNewDoc()">Criar documento</button>'+
       '</div></div>');
   return'<div class="workspace-v7 docs-app">'+
-    '<header class="ws-header ws-header--workspace"><div class="ws-header-left"><div class="ws-logo-mark"><img data-app-logo="1" src="'+window.APP_LOGO_DATA_URL+'" width="32" height="32" alt="Maiko Costa"></div><div><h1 class="ws-app-name">Roteirizador</h1><p class="ws-app-sub">Maiko Costa · Docs</p></div></div>'+
+    '<header class="ws-header ws-header--workspace"><div class="ws-header-left"><div><h1 class="ws-app-name">Workspace</h1><p class="ws-app-sub">Roteirizador · Docs</p></div></div>'+
     '<div class="ws-header-actions"><div class="ws-header-btn-row">'+
     '<button type="button" class="ws-import-btn" onclick="window.docsOpenFileImport()">Importar arquivo</button>'+
     '<button type="button" class="ws-new-btn" onclick="window.docsNewDoc()"><span>+</span> Novo documento</button>'+
@@ -8514,6 +8587,27 @@ if(!window._editorShortcutsBound){
   });
 }
 
+// Global: alterna pin da sidebar com Cmd/Ctrl + \
+if(!window._sidebarPinBound){
+  window._sidebarPinBound=true;
+  window.toggleSidebarPin=function(){
+    const sb=document.getElementById('sidebar');
+    if(!sb)return;
+    sb.classList.toggle('is-pinned');
+    if(window.showToast)window.showToast(sb.classList.contains('is-pinned')?'Sidebar fixada':'Sidebar liberada');
+  };
+  document.addEventListener('keydown',function(e){
+    const tgt=e.target;
+    const tag=(tgt&&tgt.tagName)?tgt.tagName.toLowerCase():'';
+    const isEditable=tag==='input'||tag==='textarea'||tag==='select'||(tgt&&tgt.isContentEditable);
+    if(isEditable)return;
+    if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key==='\\'){
+      e.preventDefault();
+      window.toggleSidebarPin();
+    }
+  });
+}
+
 // ── NOTES TAB ───────────────────────────────────────────────────────
 window._editorTab='blocks';
 window.switchEditorTab=function(tab){
@@ -8834,10 +8928,10 @@ window.renderTrello=function(){
       <div class="wc-card-footer">
         <div class="wc-card-actions">
           <button type="button" class="wc-act wc-act-edit" onclick="event.stopPropagation();goEditor(getRoteiro('${r.id}'))">Editar</button>
-          <button type="button" class="wc-act-icon" onclick="event.stopPropagation();openTeleprompter('${r.id}')" title="Teleprompter" aria-label="Teleprompter">▶</button>
-          <button type="button" class="wc-act-icon wc-act-share" onclick="event.stopPropagation();window.openShareModal('${r.id}')" title="Compartilhar" aria-label="Compartilhar">⤴</button>
-          <button type="button" class="wc-act-icon" onclick="window.duplicateRoteiro('${r.id}',event)" title="Duplicar" aria-label="Duplicar">⎘</button>
-          <button type="button" class="wc-act-icon" onclick="event.stopPropagation();showHistory('${r.id}')" title="Histórico" aria-label="Histórico">⟲</button>
+          <button type="button" class="wc-act-icon" onclick="event.stopPropagation();openTeleprompter('${r.id}')" title="Teleprompter" aria-label="Teleprompter"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3.6 12.4 8 5 12.4z"/></svg></button>
+          <button type="button" class="wc-act-icon wc-act-share" onclick="event.stopPropagation();window.openShareModal('${r.id}')" title="Compartilhar" aria-label="Compartilhar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10V2.5"/><path d="m5 5.5 3-3 3 3"/><path d="M3.5 9.5v3a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-3"/></svg></button>
+          <button type="button" class="wc-act-icon" onclick="window.duplicateRoteiro('${r.id}',event)" title="Duplicar" aria-label="Duplicar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5V4a1.5 1.5 0 0 0-1.5-1.5h-5A1.5 1.5 0 0 0 2.5 4v5A1.5 1.5 0 0 0 4 10.5h1.5"/></svg></button>
+          <button type="button" class="wc-act-icon" onclick="event.stopPropagation();showHistory('${r.id}')" title="Histórico" aria-label="Histórico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8a4.5 4.5 0 1 0 1.32-3.18"/><path d="M3 2.5V5h2.5"/><path d="M8 5v3.2L10 9.7"/></svg></button>
           <button type="button" class="wc-act wc-act-del" onclick="event.stopPropagation();confirmDelete('${r.id}',event)" aria-label="Excluir">Excl.</button>
         </div>
       </div>
@@ -8886,8 +8980,7 @@ window.renderTrello=function(){
   return`<div class="workspace-v7">
     <header class="ws-header ws-header--workspace">
       <div class="ws-header-left">
-        <div class="ws-logo-mark"><img data-app-logo="1" src="${window.APP_LOGO_DATA_URL}" width="32" height="32" alt="Maiko Costa"></div>
-        <div><h1 class="ws-app-name">Roteirizador</h1><p class="ws-app-sub">Maiko Costa</p></div>
+        <div><h1 class="ws-app-name">Workspace</h1><p class="ws-app-sub">Roteirizador</p></div>
       </div>
       <div class="ws-header-actions">
         <div class="ws-header-stats">
