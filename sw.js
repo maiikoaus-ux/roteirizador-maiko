@@ -5,12 +5,12 @@
    - Cache-first com revalidacao para mesma origem
    - Cache-first com fallback de rede para outras origens (CDNs/fonts)
 */
-const VERSION = 'rmc-pwa-v6';
+const VERSION = 'rmc-pwa-v9';
 const CORE = [
   './',
   './index.html',
   './landing.html',
-  './assets/css/landing-scoped.css?v=rmc6',
+  './assets/css/landing-scoped.css?v=rmc9',
   './assets/icons/logo-maiko-costa.png',
   './assets/images/hero-collage.jpg',
   './assets/images/hero-collage.png',

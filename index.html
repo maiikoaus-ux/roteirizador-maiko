@@ -18,7 +18,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="assets/icons/logo-maiko-costa.png">
 <link rel="apple-touch-icon" href="assets/icons/logo-maiko-costa.png">
-<link rel="stylesheet" href="assets/css/landing-scoped.css?v=rmc6">
+<link rel="stylesheet" href="assets/css/landing-scoped.css?v=rmc9">
 <!-- html2canvas and html2pdf loaded lazily on first PDF export -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
@@ -1916,13 +1916,15 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .auth-split-deco{position:absolute;pointer-events:none;border-radius:50%;z-index:1}
 .auth-split-mustard{width:clamp(72px,18vw,140px);height:clamp(72px,18vw,140px);background:#e9b94a;bottom:12%;left:8%;opacity:.88;box-shadow:0 12px 40px -12px rgba(233,185,74,.65)}
 .auth-split-coral{width:clamp(100px,26vw,200px);height:clamp(100px,26vw,200px);background:#ed6f5c;top:10%;right:-6%;opacity:.72;mix-blend-mode:multiply}
+@media(max-width:768px){.auth-shell::before{background-image:radial-gradient(circle at 12% 18%,rgba(106,92,56,.07) 0,transparent 28%),radial-gradient(circle at 88% 72%,rgba(106,92,56,.06) 0,transparent 32%);background-size:auto,auto;mix-blend-mode:normal;opacity:.94}.auth-split-art::before{background-image:none;opacity:0}.auth-split-coral{mix-blend-mode:normal}}
+@media(prefers-reduced-motion:reduce){.auth-shell::before{background-image:radial-gradient(circle at 12% 18%,rgba(106,92,56,.07) 0,transparent 28%),radial-gradient(circle at 88% 72%,rgba(106,92,56,.06) 0,transparent 32%);background-size:auto,auto;mix-blend-mode:normal;opacity:.96}.auth-split-art::before{background-image:none;opacity:0}.auth-split-coral{mix-blend-mode:normal}}
 .auth-split-arc{position:absolute;width:140%;height:70%;left:-20%;bottom:-8%;border:1px solid rgba(21,20,15,.12);border-radius:50%;pointer-events:none;z-index:1}
 .auth-split-square{position:absolute;top:18%;left:10%;width:48px;height:48px;border:1px solid #15140f;opacity:.2;pointer-events:none;z-index:1}
 .auth-split-dotgrid{position:absolute;bottom:14%;right:10%;width:56px;height:40px;background-image:radial-gradient(circle,#15140f 1px,transparent 1.2px);background-size:8px 8px;opacity:.22;pointer-events:none;z-index:1}
 .auth-tagline{position:absolute;left:clamp(20px,4vw,44px);bottom:clamp(20px,5vw,64px);max-width:58%;margin:0;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(14px,1.2vw,17px);line-height:1.3;color:#15140f;background:rgba(247,241,222,.92);padding:14px 18px;border:1px solid rgba(21,20,15,.08);z-index:3;pointer-events:none}
 .auth-tagline em{font-style:italic;color:#15140f}
 .auth-tagline-dot{color:#ed6f5c}
-.auth-split-main{position:relative;padding:clamp(24px,4vw,40px) clamp(22px,3.5vw,36px) 28px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:clamp(430px,46vh,535px);border-left:1px solid rgba(21,20,15,.08);background:rgba(236,228,207,.72)}
+.auth-split-main{position:relative;padding:clamp(24px,4vw,40px) clamp(22px,3.5vw,36px) 28px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:clamp(720px,62vh,880px);border-left:1px solid rgba(21,20,15,.08);background:rgba(236,228,207,.72)}
 .auth-kicker{font-family:'Inter Tight',var(--font);font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#ed6f5c;margin-top:2px}
 .auth-kicker::before{content:'';display:inline-block;width:14px;height:1px;background:#ed6f5c;margin-right:10px;vertical-align:middle}
 .auth-title{font-family:'Playfair Display',Georgia,serif;font-size:clamp(24px,3vw,32px);font-weight:600;font-style:italic;letter-spacing:-.02em;color:#15140f;line-height:1.15;margin:0}
@@ -1969,7 +1971,7 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .auth-google.is-primary:hover:not(:disabled){opacity:.9;background:#15140f}
 .auth-or{display:flex;align-items:center;gap:10px;margin:4px 0 2px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#8b8676}
 .auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:rgba(21,20,15,.12)}
-@media(max-width:720px){.auth-card-split{grid-template-columns:1fr;max-height:none}.auth-split-art{min-height:200px;max-height:36vh}.auth-split-main{border-left:none;border-top:1px solid rgba(21,20,15,.08);min-height:clamp(400px,52vh,520px)}}
+@media(max-width:720px){.auth-card-split{grid-template-columns:1fr;max-height:none}.auth-split-art{min-height:200px;max-height:36vh}.auth-split-main{border-left:none;border-top:1px solid rgba(21,20,15,.08);min-height:clamp(640px,62vh,820px)}}
 @media(max-width:480px){.auth-card:not(.auth-card-split){padding:22px 18px 18px}}
 /* === SYNC INDICATOR (Phase B) === */
 .sb-sync{width:36px;height:36px;margin:0 auto;display:flex;align-items:center;justify-content:center;cursor:default;position:relative;border-radius:8px}
@@ -2776,7 +2778,7 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
       <span class="annot tr">Plate Nº 01</span>
       <span class="annot bl">SHA · a1b2c3d</span>
       <span class="annot br">Composed in&nbsp;<span class="coral">Open Design</span></span>
-      <img src="assets/images/hero-collage.png" alt="Colagem editorial: estátua clássica com árvore brotando, câmera analógica, caderno e película — representando a criação de conteúdo.">
+      <img src="assets/images/hero-collage.png" alt="Colagem editorial: estátua clássica com árvore brotando, câmera analógica, caderno e película — representando a criação de conteúdo." decoding="async" fetchpriority="high">
       <div class="index-list">
         <span><span class="n">01</span>Escrever</span>
         <span><span class="n">02</span>Estruturar</span>
@@ -2825,7 +2827,7 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
         <span class="annot tl"><span class="coral">Fig. 02</span> / RD-26</span>
         <span class="annot br">Manifesto</span>
-        <img src="assets/images/about.avif" alt="Cena editorial relacionada ao processo criativo do Roteirizador.">
+        <img src="assets/images/about.avif" alt="Cena editorial relacionada ao processo criativo do Roteirizador." loading="lazy" decoding="async">
       </figure>
     </div>
   </div>
@@ -2861,7 +2863,7 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
         <span class="annot tl"><span class="coral">Fig. 03</span> / RD-26</span>
         <span class="annot br">Voz da rede</span>
-        <img src="assets/images/testimonial.avif" alt="Imagem editorial associada a um depoimento de criador de conteúdo.">
+        <img src="assets/images/testimonial.avif" alt="Imagem editorial associada a um depoimento de criador de conteúdo." loading="lazy" decoding="async">
       </figure>
       <blockquote class="testimonial-quote">
         <span class="quote-mark">“</span>
