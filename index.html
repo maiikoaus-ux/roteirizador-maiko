@@ -16,11 +16,12 @@
 <meta property="og:description" content="Roteiro estruturado com blocos, tempo estimado, Docs e exportação. Funciona como site estático.">
 <meta property="og:type" content="website">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="logo-maiko-costa.png">
-<link rel="apple-touch-icon" href="logo-maiko-costa.png">
+<link rel="icon" type="image/png" href="assets/icons/logo-maiko-costa.png">
+<link rel="apple-touch-icon" href="assets/icons/logo-maiko-costa.png">
+<link rel="stylesheet" href="assets/css/landing-scoped.css?v=rmc6">
 <!-- html2canvas and html2pdf loaded lazily on first PDF export -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=Inter+Tight:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#ffffff;--bg2:#f7f6f3;--bg3:#f0efe9;--text:#1a1a18;--text2:#6b6b66;--text3:#9e9e99;--border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);--radius:8px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--fi-bg:#f2f7ec;--fi-bd:#d4e2c2;--fi-tx:#3c6e08;--fm-bg:#fefce8;--fm-bd:#fef08a;--fm-tx:#a16207;--ff-bg:#fdf2ef;--ff-bd:#f0d5cc;--ff-tx:#8c3616}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-text-size-adjust:100%;touch-action:manipulation}
@@ -1903,41 +1904,73 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .bb-port-l{left:-10px;top:50%;margin-top:-10px}
 .bb-port-r{right:-10px;top:50%;margin-top:-10px}
 .bb-conn-target{outline:2px solid #4f98a3!important;outline-offset:2px}
-/* === AUTH SCREEN (Phase A) === */
-.auth-shell{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(180deg,#fbfbfa 0%,#f1efe9 100%);overflow-y:auto;font-family:var(--font);color:var(--text)}
-.auth-card{width:100%;max-width:400px;background:var(--bg);border:0.5px solid var(--border);border-radius:14px;padding:28px 26px 24px;box-shadow:0 24px 80px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:14px}
-.auth-logo{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:4px}
-.auth-logo-mark{width:44px;height:44px;border-radius:11px;overflow:hidden;background:var(--text);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+/* === AUTH SCREEN (Phase A) — identidade landing / split === */
+.auth-shell{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow-y:auto;background:#efe7d2;color:#15140f;font-family:'DM Sans',-apple-system,sans-serif}
+.auth-shell::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 12% 18%,rgba(106,92,56,.07) 0,transparent 28%),radial-gradient(circle at 88% 72%,rgba(106,92,56,.06) 0,transparent 32%),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='an'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23an)'/></svg>");background-size:auto,auto,240px 240px;mix-blend-mode:multiply;opacity:.88}
+.auth-shell>.auth-card{position:relative;z-index:1}
+.auth-card{width:100%;max-width:400px;background:rgba(255,255,255,.92);border:1px solid rgba(21,20,15,.14);border-radius:2px;padding:28px 26px 24px;box-shadow:0 40px 100px -28px rgba(21,20,15,.35);display:flex;flex-direction:column;gap:12px}
+.auth-card-split{max-width:980px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);padding:0;overflow:hidden;border-radius:2px;background:#ece4cf}
+.auth-split-art{position:relative;min-height:280px;background:#efe7d2;overflow:hidden;isolation:isolate}
+.auth-split-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center right;display:block;opacity:.96}
+.auth-split-art::before{content:'';position:absolute;inset:0;z-index:2;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='sn'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0.07 0'/></filter><rect width='100%' height='100%' filter='url(%23sn)'/></svg>");mix-blend-mode:multiply;pointer-events:none;opacity:.55}
+.auth-split-deco{position:absolute;pointer-events:none;border-radius:50%;z-index:1}
+.auth-split-mustard{width:clamp(72px,18vw,140px);height:clamp(72px,18vw,140px);background:#e9b94a;bottom:12%;left:8%;opacity:.88;box-shadow:0 12px 40px -12px rgba(233,185,74,.65)}
+.auth-split-coral{width:clamp(100px,26vw,200px);height:clamp(100px,26vw,200px);background:#ed6f5c;top:10%;right:-6%;opacity:.72;mix-blend-mode:multiply}
+.auth-split-arc{position:absolute;width:140%;height:70%;left:-20%;bottom:-8%;border:1px solid rgba(21,20,15,.12);border-radius:50%;pointer-events:none;z-index:1}
+.auth-split-square{position:absolute;top:18%;left:10%;width:48px;height:48px;border:1px solid #15140f;opacity:.2;pointer-events:none;z-index:1}
+.auth-split-dotgrid{position:absolute;bottom:14%;right:10%;width:56px;height:40px;background-image:radial-gradient(circle,#15140f 1px,transparent 1.2px);background-size:8px 8px;opacity:.22;pointer-events:none;z-index:1}
+.auth-tagline{position:absolute;left:clamp(20px,4vw,44px);bottom:clamp(20px,5vw,64px);max-width:58%;margin:0;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(14px,1.2vw,17px);line-height:1.3;color:#15140f;background:rgba(247,241,222,.92);padding:14px 18px;border:1px solid rgba(21,20,15,.08);z-index:3;pointer-events:none}
+.auth-tagline em{font-style:italic;color:#15140f}
+.auth-tagline-dot{color:#ed6f5c}
+.auth-split-main{position:relative;padding:clamp(24px,4vw,40px) clamp(22px,3.5vw,36px) 28px;display:flex;flex-direction:column;gap:10px;min-width:0;min-height:clamp(430px,46vh,535px);border-left:1px solid rgba(21,20,15,.08);background:rgba(236,228,207,.72)}
+.auth-kicker{font-family:'Inter Tight',var(--font);font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#ed6f5c;margin-top:2px}
+.auth-kicker::before{content:'';display:inline-block;width:14px;height:1px;background:#ed6f5c;margin-right:10px;vertical-align:middle}
+.auth-title{font-family:'Playfair Display',Georgia,serif;font-size:clamp(24px,3vw,32px);font-weight:600;font-style:italic;letter-spacing:-.02em;color:#15140f;line-height:1.15;margin:0}
+.auth-logo{display:flex;flex-direction:row;align-items:center;gap:12px;margin:4px 0 2px}
+.auth-logo > div{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0}
+.auth-logo-mark{width:40px;height:40px;border-radius:8px;overflow:hidden;background:#15140f;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.12);flex-shrink:0}
 .auth-logo-mark img{width:100%;height:100%;object-fit:cover;display:block}
-.auth-logo-name{font-size:14px;font-weight:500;letter-spacing:.01em}
-.auth-logo-sub{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3)}
-.auth-tabs{display:flex;border:0.5px solid var(--border2);border-radius:8px;overflow:hidden;margin:6px 0 4px}
-.auth-tab{flex:1;background:transparent;border:none;padding:9px 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);cursor:pointer;transition:background .12s,color .12s}
-.auth-tab.active{background:var(--text);color:var(--bg)}
-.auth-tab:not(.active):hover{background:var(--bg2);color:var(--text)}
-.auth-form{display:flex;flex-direction:column;gap:10px}
+.auth-logo-name{font-size:13px;font-weight:600;letter-spacing:.01em;font-family:'Inter Tight',var(--font)}
+.auth-logo-sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#8b8676}
+.auth-tabs{display:flex;border:1px solid rgba(21,20,15,.18);border-radius:999px;overflow:hidden;margin:4px 0 2px}
+.auth-tab{flex:1;background:transparent;border:none;padding:10px 12px;font-family:'Inter Tight',var(--font);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5a5448;cursor:pointer;transition:background .12s,color .12s}
+.auth-tab.active{background:#15140f;color:#efe7d2}
+.auth-tab:not(.active):hover{color:#15140f;background:rgba(21,20,15,.04)}
+.auth-form{display:flex;flex-direction:column;gap:8px}
 .auth-field{display:flex;flex-direction:column;gap:5px}
-.auth-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.auth-input{font-family:var(--font);font-size:13px;padding:9px 11px;border:0.5px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);width:100%;line-height:1.5;transition:border-color .12s,box-shadow .12s}
-.auth-input:focus{outline:none;border-color:var(--text2);box-shadow:0 0 0 2px rgba(0,0,0,.05)}
-.auth-input:disabled{opacity:.55;cursor:not-allowed;background:var(--bg2)}
-.auth-submit{font-family:var(--font);font-size:13px;font-weight:500;padding:10px 14px;border-radius:7px;border:0.5px solid var(--text);background:var(--text);color:var(--bg);cursor:pointer;transition:opacity .12s;margin-top:4px}
-.auth-submit:hover:not(:disabled){opacity:.86}
-.auth-submit:disabled{opacity:.55;cursor:not-allowed}
-.auth-link{background:none;border:none;padding:0;font-family:var(--font);font-size:12px;color:var(--text2);cursor:pointer;text-align:center;text-decoration:underline;text-decoration-thickness:0.5px;text-underline-offset:3px}
-.auth-link:hover{color:var(--text)}
-.auth-msg{font-size:12px;line-height:1.5;padding:9px 11px;border-radius:7px;border:0.5px solid var(--border);background:var(--bg2);color:var(--text);min-height:0}
+.auth-label{font-family:'Inter Tight',var(--font);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#5a5448}
+.auth-input{font-family:var(--font);font-size:14px;padding:11px 12px;border:1px solid rgba(21,20,15,.22);border-radius:2px;background:rgba(255,255,255,.45);color:#15140f;width:100%;line-height:1.5;transition:border-color .12s,box-shadow .12s}
+.auth-input:focus{outline:none;border-color:#ed6f5c;box-shadow:0 0 0 3px rgba(237,111,92,.12)}
+.auth-input:disabled{opacity:.55;cursor:not-allowed;background:rgba(247,246,243,.8)}
+.auth-submit{font-family:'Inter Tight',var(--font);font-size:14px;font-weight:600;padding:12px 16px;border-radius:999px;border:1px solid #ed6f5c;background:#ed6f5c;color:#fff;cursor:pointer;transition:transform .15s,background .15s;margin-top:6px;box-shadow:0 14px 26px -16px rgba(237,111,92,1)}
+.auth-submit:hover:not(:disabled){transform:translateY(-1px);background:#e25e4a}
+.auth-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.auth-link{background:none;border:none;padding:0;font-family:var(--font);font-size:12px;color:#5a5448;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-thickness:.5px;text-underline-offset:3px}
+.auth-link:hover{color:#ed6f5c}
+.auth-msg{font-size:12px;line-height:1.5;padding:9px 11px;border-radius:2px;border:1px solid rgba(21,20,15,.12);background:rgba(255,255,255,.6);color:#15140f;min-height:0}
 .auth-msg.is-error{background:#fdf2ef;border-color:#f0d5cc;color:#8c3616}
 .auth-msg.is-success{background:#f2f7ec;border-color:#d4e2c2;color:#3c6e08}
 .auth-msg.is-info{background:#eff6ff;border-color:#cfe0f5;color:#1e3a73}
-.auth-reset{display:flex;flex-direction:column;gap:10px;padding:12px;border:0.5px dashed var(--border2);border-radius:8px;background:var(--bg2)}
-.auth-reset-title{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.auth-reset{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px dashed rgba(21,20,15,.2);border-radius:2px;background:rgba(239,231,210,.55)}
+.auth-reset-title{font-family:'Inter Tight',var(--font);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8b8676}
 .auth-reset-actions{display:flex;gap:6px}
 .auth-reset-actions .auth-submit{flex:1;margin:0}
-.auth-reset-cancel{font-family:var(--font);font-size:12px;padding:9px 12px;border-radius:7px;border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer}
-.auth-reset-cancel:hover{background:var(--bg)}
-.auth-foot{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);text-align:center;margin-top:4px}
-@media(max-width:480px){.auth-card{padding:22px 18px 18px;border-radius:12px}}
+.auth-reset-cancel{font-family:var(--font);font-size:12px;padding:9px 12px;border-radius:999px;border:1px solid rgba(21,20,15,.22);background:transparent;color:#15140f;cursor:pointer}
+.auth-reset-cancel:hover{background:rgba(255,255,255,.5)}
+.auth-foot{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#8b8676;text-align:left;margin-top:6px}
+.auth-terms{display:flex;align-items:flex-start;gap:10px;font-family:var(--font);font-size:13px;color:var(--text2);line-height:1.5;margin-top:4px}
+.auth-terms input{margin-top:3px;accent-color:#ed6f5c;width:16px;height:16px;flex-shrink:0}
+.auth-terms a{color:var(--text);text-decoration:underline;text-underline-offset:2px}
+.auth-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;font-family:'Inter Tight',var(--font);font-size:13px;font-weight:600;padding:11px 14px;border-radius:999px;border:1px solid rgba(21,20,15,.16);background:rgba(239,231,210,.5);color:#15140f;cursor:pointer;transition:background .12s,border-color .12s;margin-top:4px}
+.auth-google:hover:not(:disabled){background:rgba(255,255,255,.55);border-color:#6b6b66}
+.auth-google:disabled{opacity:.55;cursor:not-allowed}
+.auth-google .auth-google-ico{width:18px;height:18px;flex-shrink:0}
+.auth-google.is-primary{background:#15140f;color:#efe7d2;border-color:#15140f}
+.auth-google.is-primary:hover:not(:disabled){opacity:.9;background:#15140f}
+.auth-or{display:flex;align-items:center;gap:10px;margin:4px 0 2px;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#8b8676}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:rgba(21,20,15,.12)}
+@media(max-width:720px){.auth-card-split{grid-template-columns:1fr;max-height:none}.auth-split-art{min-height:200px;max-height:36vh}.auth-split-main{border-left:none;border-top:1px solid rgba(21,20,15,.08);min-height:clamp(400px,52vh,520px)}}
+@media(max-width:480px){.auth-card:not(.auth-card-split){padding:22px 18px 18px}}
 /* === SYNC INDICATOR (Phase B) === */
 .sb-sync{width:36px;height:36px;margin:0 auto;display:flex;align-items:center;justify-content:center;cursor:default;position:relative;border-radius:8px}
 .sb-sync .sync-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;transition:background .25s ease}
@@ -1946,14 +1979,6 @@ body.focus-mode-on:hover .sprint-bar,body.focus-mode-on:hover .stats-pill-bar{op
 .sb-sync.is-offline .sync-dot{background:#9ca3af}
 .sb-sync[title]:hover::after{content:attr(title);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:var(--text);color:var(--bg);padding:4px 9px;border-radius:6px;font-family:var(--mono);font-size:9.5px;white-space:nowrap;z-index:9999;pointer-events:none;letter-spacing:.04em}
 /* === SHARING (Phase C) === */
-.auth-google{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:var(--font);font-size:13px;font-weight:500;padding:10px 14px;border-radius:7px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer;transition:background .12s,border-color .12s;margin-top:2px}
-.auth-google:hover:not(:disabled){background:var(--bg2);border-color:var(--text2)}
-.auth-google:disabled{opacity:.55;cursor:not-allowed}
-.auth-google .auth-google-ico{width:16px;height:16px;flex-shrink:0}
-.auth-google.is-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
-.auth-google.is-primary:hover:not(:disabled){opacity:.86;background:var(--text)}
-.auth-or{display:flex;align-items:center;gap:10px;margin:6px 0;font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)}
-.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border)}
 
 .share-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px}
 .share-modal{background:var(--bg);border:0.5px solid var(--border);border-radius:14px;padding:22px 22px 18px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:14px;font-family:var(--font)}
@@ -2642,7 +2667,7 @@ body.is-share-readonly [contenteditable]::before{opacity:.55}
 </style>
 <script>
 window.APP_LOGO_DATA_URL='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%231a1a18%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20fill%3D%22%23fafaf8%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%20text-anchor%3D%22middle%22%20font-family%3D%22system-ui%2Csans-serif%22%3EMC%3C/text%3E%3C/svg%3E';
-window.APP_LOGO_PNG_NAME='logo-maiko-costa.png';
+window.APP_LOGO_PNG_NAME='assets/icons/logo-maiko-costa.png';
 window.applyAppLogoDataUrl=function(u){
   if(!u||typeof u!=='string')return;
   window.APP_LOGO_DATA_URL=u;
@@ -2652,7 +2677,7 @@ window.applyAppLogoDataUrl=function(u){
 (function(){
   function tryLoadPng(){
     if(!window.fetch)return;
-    var name=window.APP_LOGO_PNG_NAME||'logo-maiko-costa.png';
+    var name=window.APP_LOGO_PNG_NAME||'assets/icons/logo-maiko-costa.png';
     fetch(name,{cache:'force-cache'})
       .then(function(r){return r.ok?r.blob():Promise.reject();})
       .then(function(blob){
@@ -2681,7 +2706,200 @@ if('serviceWorker' in navigator&&location.protocol!=='file:'){
 </script>
 </head>
 <body>
-<div class="app-shell" id="app-shell">
+<div id="public-landing">
+<div class="landing-scope">
+<div class="side-rail right" aria-hidden="true">
+  <span class="rail-text">Roteirizador · Maiko Costa · v1.15 · Beta · 2026</span>
+</div>
+<div class="side-rail left" aria-hidden="true">
+  <span class="rail-text">Roteiros · Docs · Beat Board · Teleprompter</span>
+</div>
+
+<div class="shell">
+
+<div class="topbar">
+  <div class="rd-container topbar-inner">
+    <span class="coral"><b>MAIKOMARDELY</b> &nbsp;|&nbsp; THINKING</span>
+    <span class="mid"><span>Crieative <b>Intelligent</b></span></span>
+    <span class="right">
+      <span><span class="pulse-dot"></span>Live · v1.15</span>
+      <span><b>PT</b> · EN · ES</span>
+    </span>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="rd-container nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">Ø</span>
+      <span>Roteirizador</span>
+      <span class="brand-meta"><b>v 1.15 Beta</b>Em desenvolvimento</span>
+    </a>
+    <nav aria-label="Principal">
+      <ul class="nav-links">
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#como-funciona">Como funciona</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+    </nav>
+    <div class="nav-side">
+      <button type="button" class="nav-cta ghost" id="nav-open-login" onclick="window.enterAuth&&window.enterAuth('signin')">Entrar</button>
+      <button type="button" class="nav-cta" id="nav-open-signup" onclick="window.enterAuth&&window.enterAuth('signup')">Criar conta <span class="star">★</span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="rd-container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-eyebrow">
+        <span class="coral-rule"></span>
+        <span class="coral">Roteirizador</span>
+        <span>·</span>
+        <span>Maiko Costa</span>
+      </span>
+      <h1 class="display">
+        Seus <em>roteiros</em>,<br>
+        <em>suas</em> ideias<br>
+        <em>virando</em> conteúdo,<br>
+        <em>de verdade</em><span class="dot">.</span>
+      </h1>
+      <p class="lead">Do rascunho ao teleprompter. Blocos, Docs, Beat Board e IA — tudo no mesmo lugar, feito pra quem cria pras redes.</p>
+      <div class="hero-actions">
+        <button type="button" class="btn btn-primary" id="hero-open-signup" onclick="window.enterAuth&&window.enterAuth('signup')">Começar agora <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M19 5H8M19 5v11"/></svg></span></button>
+        <a class="btn btn-ghost" href="#como-funciona">Ver como funciona <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4V8z" fill="currentColor" stroke="none"/></svg></span></a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <span class="annot tl"><span class="coral">Fig. 01</span> / RD-26</span>
+      <span class="annot tr">Plate Nº 01</span>
+      <span class="annot bl">SHA · a1b2c3d</span>
+      <span class="annot br">Composed in&nbsp;<span class="coral">Open Design</span></span>
+      <img src="assets/images/hero-collage.png" alt="Colagem editorial: estátua clássica com árvore brotando, câmera analógica, caderno e película — representando a criação de conteúdo.">
+      <div class="index-list">
+        <span><span class="n">01</span>Escrever</span>
+        <span><span class="n">02</span>Estruturar</span>
+        <span class="on"><span class="n">03</span>Gravar</span>
+        <span><span class="n">04</span>Publicar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rd-container">
+    <div class="hero-strip">
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-ring">∞</span><span class="stat-label"><b>Roteiros</b>Estruturados</span></div>
+        <div class="stat"><span class="stat-ring">3</span><span class="stat-label"><b>Fases</b>Início, meio, fim</span></div>
+        <div class="stat"><span class="stat-ring coral">IA</span><span class="stat-label"><b>Integrada</b>Reescrita inteligente</span></div>
+      </div>
+      <p class="epigraph hero-epigraph"><span class="mark">↳</span>A IDEIA QUE DEUS PLANTOU AO CONTEÚDO QUE O MUNDO VAI VER.</p>
+    </div>
+  </div>
+
+  <div class="rd-container">
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-label"><b>Da rede</b><span>Open · 14 cidades · 8 criadores</span></div>
+      <div class="marquee-rows">
+        <div class="marquee-row"><div class="marquee-track"><div class="marquee-seq"><span><span class="coord">23.55°S</span> São Paulo</span><span class="m-sep">·</span><span><span class="coord">22.90°S</span> Rio de Janeiro</span><span class="m-sep">·</span><span><span class="coord">25.43°S</span> Curitiba</span><span class="m-sep">·</span><span><span class="coord">19.92°S</span> Belo Horizonte</span><span class="m-sep">·</span><span><span class="coord">8.05°S</span> Recife</span><span class="m-sep">·</span><span><span class="coord">30.03°S</span> Porto Alegre</span><span class="m-sep">·</span><span><span class="coord">27.59°S</span> Florianópolis</span><span class="m-sep">·</span><span><span class="coord">12.97°S</span> Salvador</span><span class="m-sep">·</span><span><span class="coord">3.73°S</span> Fortaleza</span><span class="m-sep">·</span><span><span class="coord">15.78°S</span> Brasília</span><span class="m-sep">·</span><span><span class="coord">38.72°N</span> Lisboa</span><span class="m-sep">·</span><span><span class="coord">40.71°N</span> New York</span><span class="m-sep">·</span></div><div class="marquee-seq"><span><span class="coord">23.55°S</span> São Paulo</span><span class="m-sep">·</span><span><span class="coord">22.90°S</span> Rio de Janeiro</span><span class="m-sep">·</span><span><span class="coord">25.43°S</span> Curitiba</span><span class="m-sep">·</span><span><span class="coord">19.92°S</span> Belo Horizonte</span><span class="m-sep">·</span><span><span class="coord">8.05°S</span> Recife</span><span class="m-sep">·</span><span><span class="coord">30.03°S</span> Porto Alegre</span><span class="m-sep">·</span><span><span class="coord">27.59°S</span> Florianópolis</span><span class="m-sep">·</span><span><span class="coord">12.97°S</span> Salvador</span><span class="m-sep">·</span><span><span class="coord">3.73°S</span> Fortaleza</span><span class="m-sep">·</span><span><span class="coord">15.78°S</span> Brasília</span><span class="m-sep">·</span><span><span class="coord">38.72°N</span> Lisboa</span><span class="m-sep">·</span><span><span class="coord">40.71°N</span> New York</span><span class="m-sep">·</span></div></div></div>
+        <div class="marquee-row"><div class="marquee-track reverse"><div class="marquee-seq"><span><span class="hot">@maikoaus</span> 24 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@mardelyc</span> 18 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@pedroandrade</span> 12 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@juliamoreno</span> 9 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@rafabrito</span> 15 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@liatavares</span> 21 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@brunosato</span> 7 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@camiladuarte</span> 11 roteiros</span><span class="m-sep coral">·</span></div><div class="marquee-seq"><span><span class="hot">@maikoaus</span> 24 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@mardelyc</span> 18 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@pedroandrade</span> 12 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@juliamoreno</span> 9 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@rafabrito</span> 15 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@liatavares</span> 21 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@brunosato</span> 7 roteiros</span><span class="m-sep coral">·</span><span><span class="hot">@camiladuarte</span> 11 roteiros</span><span class="m-sep coral">·</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sobre">
+  <div class="rd-container">
+    <div class="sec-rule">
+      <span class="roman">II.</span>
+      <span class="meta-grp"><span>Sobre</span><span class="dot-mark">•</span><span>Manifesto</span></span>
+      <span>002 / 005</span>
+    </div>
+    <div class="about-grid">
+      <div class="about-copy">
+        <h2><em>Teleprompter</em> integrado.<br>Você lê o roteiro batido e <em>grava</em><br>com <em>ritmo</em>, sem tropeço<span style="color:var(--coral)">.</span></h2>
+        <p class="section-lead text-justify">O Roteirizador nasceu da bagunça de quem cria conteúdo no celular, no Notion, no Docs e em mil abas abertas. A gente juntou tudo numa ferramenta só — pensada por quem cria, pra quem cria.</p>
+        <p class="section-lead text-justify" style="margin-top:18px">Da primeira faísca até o vídeo no ar, sem perder o fio da meada nem o seu jeito de falar.</p>
+      </div>
+      <figure class="about-art">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <span class="annot tl"><span class="coral">Fig. 02</span> / RD-26</span>
+        <span class="annot br">Manifesto</span>
+        <img src="assets/images/about.avif" alt="Cena editorial relacionada ao processo criativo do Roteirizador.">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona">
+  <div class="rd-container">
+    <div class="sec-rule">
+      <span class="roman">III.</span>
+      <span class="meta-grp"><span>Como funciona</span><span class="dot-mark">•</span><span>Quatro passos</span></span>
+      <span>003 / 005</span>
+    </div>
+    <h2 style="margin-top:20px">Da <em>ideia</em> ao <em>publicar</em><span style="color:var(--coral)">.</span></h2>
+    <p class="section-lead text-justify">Um fluxo pensado pra acontecer rápido, sem te tirar do estado criativo.</p>
+    <div class="steps-grid">
+      <article class="step-card"><div class="step-num">01</div><h3>Escrever</h3><p class="text-justify">Bota a ideia no papel — solta, livre, sem julgamento. Bloco por bloco, do seu jeito.</p></article>
+      <article class="step-card"><div class="step-num">02</div><h3>Estruturar</h3><p class="text-justify">Início, meio e fim no lugar. A IA te ajuda a fechar o argumento sem perder o seu tom.</p></article>
+      <article class="step-card"><div class="step-num">03</div><h3>Gravar</h3><p class="text-justify">Teleprompter integrado. Você lê o roteiro batido e grava com ritmo, sem tropeço.</p></article>
+      <article class="step-card"><div class="step-num">04</div><h3>Publicar</h3><p class="text-justify">Exporta legendas, cortes e descrições prontos pras plataformas. Direto pro seu fluxo.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="depoimento">
+  <div class="rd-container">
+    <div class="sec-rule">
+      <span class="roman">IV.</span>
+      <span class="meta-grp"><span>Depoimento</span><span class="dot-mark">•</span><span>De quem cria</span></span>
+      <span>004 / 005</span>
+    </div>
+    <div class="testimonial-grid">
+      <figure class="testimonial-art">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <span class="annot tl"><span class="coral">Fig. 03</span> / RD-26</span>
+        <span class="annot br">Voz da rede</span>
+        <img src="assets/images/testimonial.avif" alt="Imagem editorial associada a um depoimento de criador de conteúdo.">
+      </figure>
+      <blockquote class="testimonial-quote">
+        <span class="quote-mark">“</span>
+        <p>Antes eu perdia <em>horas</em> só tentando organizar a ideia. Agora abro o Roteirizador, escrevo no fluxo e saio com o roteiro pronto pra gravar — <em>no mesmo dia</em>.</p>
+        <footer><span class="who">— Mardely Costa</span><span class="role">ARQUITETA DESIGNER</span></footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contato">
+  <div class="rd-container">
+    <div class="sec-rule">
+      <span class="roman">V.</span>
+      <span class="meta-grp"><span>Contato</span><span class="dot-mark">•</span><span>Entrar na beta</span></span>
+      <span>005 / 005</span>
+    </div>
+    <h2 style="margin-top:20px">Pronto pra <em>roteirizar</em><span style="color:var(--coral)">?</span></h2>
+    <p class="section-lead text-justify">Estamos abrindo a beta privada aos poucos. Deixe seu contato e a gente te chama.</p>
+    <div class="hero-actions" style="margin-top:36px">
+      <button type="button" class="btn btn-primary" id="cta-open-signup" onclick="window.enterAuth&&window.enterAuth('signup')">Quero entrar na beta <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M19 5H8M19 5v11"/></svg></span></button>
+      <a class="btn btn-ghost" href="mailto:contato@roteirizador.app">Falar com a gente <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M19 5H8M19 5v11"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="rd-container foot-inner">
+    <span><b>Roteirizador</b> · Maiko Costa</span>
+    <span>Composed in <span class="coral">Brazil</span> · 2026</span>
+    <span><span class="pulse-dot"></span>Live · v1.15 Beta</span>
+  </div>
+</footer>
+
+</div>
+</div>
+</div>
+<div class="app-shell" id="app-shell" style="display:none">
 
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo" title="Expandir / recolher (Ctrl+\)" onclick="window.toggleSidebarPin&&window.toggleSidebarPin()" role="button" aria-label="Expandir ou recolher menu">
@@ -3540,13 +3758,16 @@ window.authSignIn=async function(email,password){
   }
 };
 
-window.authSignUp=async function(email,password){
+window.authSignUp=async function(email,password,fullName){
   const sb=_authClient();if(!sb)return{ok:false,error:'sdk'};
   email=String(email||'').trim();password=String(password||'');
+  fullName=String(fullName||'').trim();
   if(!_authValidEmail(email))return{ok:false,error:'Email inválido.'};
   if(password.length<6)return{ok:false,error:'Senha muito curta. Use pelo menos 6 caracteres.'};
+  if(fullName.length<2)return{ok:false,error:'Informe seu nome (mínimo 2 caracteres).'};
   try{
-    const{data,error}=await sb.auth.signUp({email,password});
+    const meta={full_name:fullName,name:fullName,display_name:fullName};
+    const{data,error}=await sb.auth.signUp({email,password,options:{data:meta}});
     if(error)throw error;
     return{ok:true,data};
   }catch(e){
@@ -3604,11 +3825,11 @@ window.authSignInWithGoogle=async function(){
 
 function renderAuthScreen(){
   const st=window._authState;
-  const logoUrl=window.APP_LOGO_DATA_URL||'';
   const isSignin=st.mode==='signin';
-  const submitLabel=st.busy?'Aguarde...':(isSignin?'Entrar':'Criar conta');
+  const submitLogin=st.busy?'Aguarde...':'Entrar no Roteirizador';
+  const submitSignup=st.busy?'Aguarde...':'Criar conta no Roteirizador';
   const msgHtml=st.msg?`<div class="auth-msg is-${st.msg.kind}">${window.esc(st.msg.text)}</div>`:'';
-  const resetHtml=st.resetOpen?`
+  const resetHtml=isSignin?(st.resetOpen?`
     <div class="auth-reset">
       <span class="auth-reset-title">Recuperar senha</span>
       <input id="auth-reset-email" class="auth-input" type="email" autocomplete="email" placeholder="seu@email.com" ${st.busy?'disabled':''}>
@@ -3617,7 +3838,7 @@ function renderAuthScreen(){
         <button type="button" class="auth-submit" onclick="window._authSubmitReset()" ${st.busy?'disabled':''}>${st.busy?'Enviando...':'Enviar link'}</button>
       </div>
     </div>`:`
-    <button type="button" class="auth-link" onclick="window._authToggleReset(true)">Esqueci minha senha</button>`;
+    <button type="button" class="auth-link" onclick="window._authToggleReset(true)">Esqueci minha senha</button>`):'';
   const googlePrimary=window._authGoogleHighlighted?' is-primary':'';
   const googleIco=`<svg class="auth-google-ico" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.48 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>`;
   const googleBtnHtml=`
@@ -3625,32 +3846,60 @@ function renderAuthScreen(){
         ${googleIco}<span>Continuar com Google</span>
       </button>
       <div class="auth-or"><span>ou com email</span></div>`;
+  const loginFormHtml=`
+        <form class="auth-form" onsubmit="event.preventDefault();window._authSubmit();">
+          <div class="auth-field">
+            <label class="auth-label" for="auth-email">Email</label>
+            <input id="auth-email" class="auth-input" type="email" autocomplete="email" placeholder="seu@email.com" ${st.busy?'disabled':''}>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="auth-password">Senha</label>
+            <input id="auth-password" class="auth-input" type="password" autocomplete="current-password" placeholder="sua senha" ${st.busy?'disabled':''}>
+          </div>
+          <button type="submit" class="auth-submit" ${st.busy?'disabled':''}>${submitLogin}</button>
+        </form>
+        ${resetHtml}`;
+  const signupFormHtml=`
+        <form class="auth-form" onsubmit="event.preventDefault();window._authSubmit();">
+          <div class="auth-field">
+            <label class="auth-label" for="auth-name">Nome</label>
+            <input id="auth-name" class="auth-input" type="text" autocomplete="name" placeholder="Como podemos te chamar" ${st.busy?'disabled':''}>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="auth-email">Email</label>
+            <input id="auth-email" class="auth-input" type="email" autocomplete="email" placeholder="seu@email.com" ${st.busy?'disabled':''}>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="auth-password">Senha</label>
+            <input id="auth-password" class="auth-input" type="password" autocomplete="new-password" placeholder="mínimo 6 caracteres" ${st.busy?'disabled':''}>
+          </div>
+          <label class="auth-terms">
+            <input type="checkbox" id="auth-terms" ${st.busy?'disabled':''}>
+            <span>Aceito os <a href="#" onclick="return false;">termos</a> e a <a href="#" onclick="return false;">política de privacidade</a></span>
+          </label>
+          <button type="submit" class="auth-submit" ${st.busy?'disabled':''}>${submitSignup}</button>
+        </form>`;
   return`
-    <div class="auth-card" role="dialog" aria-label="Autenticação">
-      <div class="auth-logo">
-        <div class="auth-logo-mark">${logoUrl?`<img src="${window.esc(logoUrl)}" alt="Roteirizador Maiko Costa">`:''}</div>
-        <span class="auth-logo-name">Roteirizador Maiko Costa</span>
-        <span class="auth-logo-sub">v1.15 <span class="beta-tag">BETA</span> em desenvolvimento</span>
+    <div class="auth-card auth-card-split" role="dialog" aria-label="Autenticação">
+      <div class="auth-split-art" aria-hidden="true">
+        <img src="assets/images/auth-bg.avif" alt="">
+        <p class="auth-tagline">A mensagem que você carrega merece ser <em>ouvida</em>. Aqui ela sai do rascunho e vai pro mundo<span class="auth-tagline-dot">.</span></p>
       </div>
-      <div class="auth-tabs" role="tablist">
-        <button type="button" class="auth-tab ${isSignin?'active':''}" role="tab" aria-selected="${isSignin}" onclick="window._authSwitchMode('signin')" ${st.busy?'disabled':''}>Entrar</button>
-        <button type="button" class="auth-tab ${!isSignin?'active':''}" role="tab" aria-selected="${!isSignin}" onclick="window._authSwitchMode('signup')" ${st.busy?'disabled':''}>Criar conta</button>
+      <div class="auth-split-main">
+        <p class="auth-kicker">Roteirizador · Maiko Costa</p>
+        <h2 class="auth-title">${isSignin?'Bem-vindo de volta':'Crie sua conta'}</h2>
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab ${isSignin?'active':''}" role="tab" aria-selected="${isSignin}" onclick="window._authSwitchMode('signin')" ${st.busy?'disabled':''}>Entrar</button>
+          <button type="button" class="auth-tab ${!isSignin?'active':''}" role="tab" aria-selected="${!isSignin}" onclick="window._authSwitchMode('signup')" ${st.busy?'disabled':''}>Criar conta</button>
+        </div>
+        ${msgHtml}
+        ${googleBtnHtml}
+        ${isSignin?loginFormHtml:signupFormHtml}
+        <div class="auth-foot" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <button type="button" class="auth-link" onclick="window.backToPublicLanding&&window.backToPublicLanding()">Voltar ao site</button>
+          <span>Acesso seguro · Supabase</span>
+        </div>
       </div>
-      ${msgHtml}
-      ${googleBtnHtml}
-      <form class="auth-form" onsubmit="event.preventDefault();window._authSubmit();">
-        <div class="auth-field">
-          <label class="auth-label" for="auth-email">Email</label>
-          <input id="auth-email" class="auth-input" type="email" autocomplete="email" placeholder="seu@email.com" ${st.busy?'disabled':''}>
-        </div>
-        <div class="auth-field">
-          <label class="auth-label" for="auth-password">Senha</label>
-          <input id="auth-password" class="auth-input" type="password" autocomplete="${isSignin?'current-password':'new-password'}" placeholder="${isSignin?'sua senha':'mínimo 6 caracteres'}" ${st.busy?'disabled':''}>
-        </div>
-        <button type="submit" class="auth-submit" ${st.busy?'disabled':''}>${submitLabel}</button>
-      </form>
-      ${resetHtml}
-      <div class="auth-foot">Acesso seguro · Supabase</div>
     </div>`;
 }
 
@@ -3690,13 +3939,20 @@ window._authSubmit=async function(){
   window._authState.busy=true;window._authState.msg=null;_authRerender();
   try{
     if(window._authState.mode==='signup'){
-      const r=await window.authSignUp(email,password);
-      if(r.ok){
-        window._authState.msg={kind:'success',text:'Verifique seu email para confirmar o cadastro antes de entrar.'};
-        if(window.showToast)window.showToast('Verifique seu email para confirmar o cadastro antes de entrar.');
-        window._authState.mode='signin';
+      const nameEl=document.getElementById('auth-name');
+      const termsEl=document.getElementById('auth-terms');
+      const fullName=nameEl?nameEl.value:'';
+      if(!termsEl||!termsEl.checked){
+        window._authState.msg={kind:'error',text:'Aceite os termos e a política de privacidade para criar a conta.'};
       }else{
-        window._authState.msg={kind:'error',text:r.error||'Não foi possível criar a conta.'};
+        const r=await window.authSignUp(email,password,fullName);
+        if(r.ok){
+          window._authState.msg={kind:'success',text:'Verifique seu email para confirmar o cadastro antes de entrar.'};
+          if(window.showToast)window.showToast('Verifique seu email para confirmar o cadastro antes de entrar.');
+          window._authState.mode='signin';
+        }else{
+          window._authState.msg={kind:'error',text:r.error||'Não foi possível criar a conta.'};
+        }
       }
     }else{
       const r=await window.authSignIn(email,password);
@@ -3733,12 +3989,48 @@ function _authRerender(focusInput){
   if(!shell)return;
   shell.innerHTML=renderAuthScreen();
   if(focusInput){
-    const f=shell.querySelector('input[type="email"]:not([disabled])')||shell.querySelector('input:not([disabled])');
-    if(f)setTimeout(()=>f.focus(),0);
+    var mode=window._authState&&window._authState.mode;
+    var f=shell.querySelector('#auth-name:not([disabled])');
+    if(mode!=='signup'||!f)f=shell.querySelector('input[type="email"]:not([disabled])')||shell.querySelector('input:not([disabled])');
+    if(f)setTimeout(function(){f.focus();},0);
   }
 }
 
+window.showPublicLanding=function(){
+  var pl=document.getElementById('public-landing');
+  if(!pl)return;
+  pl.classList.add('is-visible');
+  var app=document.getElementById('app-shell');
+  if(app)app.style.display='none';
+};
+window.hidePublicLanding=function(){
+  var pl=document.getElementById('public-landing');
+  if(!pl)return;
+  pl.classList.remove('is-visible');
+};
+window.enterAuth=function(mode){
+  if(!window._authState)window._authState={mode:'signin',busy:false,resetOpen:false,msg:null};
+  window._authState.mode=mode==='signup'?'signup':'signin';
+  window._authState.msg=null;
+  window._authState.resetOpen=false;
+  window._authState.busy=false;
+  if(window.hidePublicLanding)window.hidePublicLanding();
+  if(window.showAuthScreen)window.showAuthScreen();
+};
+window.enterApp=function(){
+  if(window.hidePublicLanding)window.hidePublicLanding();
+  if(window.hideAuthScreen)window.hideAuthScreen();
+};
+window.backToPublicLanding=function(){
+  var sh=document.getElementById('auth-shell');
+  if(sh)sh.remove();
+  window._authState={mode:'signin',busy:false,resetOpen:false,msg:null};
+  window._authGoogleHighlighted=false;
+  if(window.showPublicLanding)window.showPublicLanding();
+};
+
 window.showAuthScreen=function(){
+  if(window.hidePublicLanding)window.hidePublicLanding();
   let shell=document.getElementById('auth-shell');
   if(!shell){
     shell=document.createElement('div');
@@ -3750,18 +4042,34 @@ window.showAuthScreen=function(){
   const appShell=document.getElementById('app-shell');
   if(appShell)appShell.style.display='none';
   setTimeout(function(){
-    const f=shell.querySelector('input[type="email"]');
+    var mode=window._authState&&window._authState.mode;
+    var f=shell.querySelector('#auth-name:not([disabled])');
+    if(mode!=='signup'||!f)f=shell.querySelector('input[type="email"]:not([disabled])')||shell.querySelector('input:not([disabled])');
     if(f)f.focus();
   },0);
 };
 
-window.hideAuthScreen=function(){
+window.hideAuthScreen=function(opts){
   const shell=document.getElementById('auth-shell');
   if(shell)shell.remove();
   const appShell=document.getElementById('app-shell');
-  if(appShell)appShell.style.display='';
+  if(appShell){
+    if(opts&&opts.keepAppHidden){
+      appShell.style.display='none';
+    }else{
+      if(window.hidePublicLanding)window.hidePublicLanding();
+      appShell.style.display='';
+    }
+  }
   window._authState={mode:'signin',busy:false,resetOpen:false,msg:null};
+  window._authGoogleHighlighted=false;
 };
+
+window.authSwitchMode=window._authSwitchMode;
+window.authSubmit=window._authSubmit;
+window.authSubmitReset=window._authSubmitReset;
+window.authToggleReset=window._authToggleReset;
+window.authGoogleClick=window._authGoogleClick;
 
 // === SECTION: PERSISTENCE PHASE B (Supabase remote) ===
 // Cada chamada remota: confere sessão, faz fire-and-forget, atualiza indicador.
@@ -10974,8 +11282,48 @@ window.openCharNav=function(){
 
 render();
 
+function _authLooksLikeOAuthReturn(){
+  try{
+    var s=window.location.search||'';
+    var h=window.location.hash||'';
+    if(s.indexOf('code=')!==-1)return true;
+    if(h.indexOf('access_token')!==-1)return true;
+    if(h.indexOf('refresh_token')!==-1)return true;
+    return false;
+  }catch(e){return false;}
+}
+
+async function _authGetSessionWithRetry(){
+  if(!window.supabase||!window.supabase.auth)return null;
+  var tries=_authLooksLikeOAuthReturn()?10:1;
+  var wait=0;
+  for(var i=0;i<tries;i++){
+    if(i>0)await new Promise(function(r){setTimeout(r,wait);});
+    wait=90;
+    var r=await window.supabase.auth.getSession();
+    if(r&&r.data&&r.data.session)return r.data.session;
+  }
+  return null;
+}
+
+function _authStripOAuthQueryFromUrl(){
+  try{
+    var u=new URL(window.location.href);
+    var h=window.location.hash||'';
+    var dirtyHash=h&&(h.indexOf('access_token')!==-1||h.indexOf('refresh_token')!==-1||h.indexOf('type=')!==-1);
+    var dirtyQs=u.searchParams.has('code')||u.searchParams.has('state')||u.searchParams.get('p')==='g';
+    if(!dirtyQs&&!dirtyHash)return;
+    u.searchParams.delete('code');
+    u.searchParams.delete('state');
+    if(u.searchParams.get('p')==='g')u.searchParams.delete('p');
+    var qs=u.searchParams.toString();
+    var path=u.pathname+(qs?'?'+qs:'');
+    window.history.replaceState({},document.title,path);
+  }catch(e){}
+}
+
 // === SECTION: AUTH BOOTSTRAP (Phase A) + HYDRATE (Phase B) ===
-// Verifica sessão ativa e mostra a tela de auth se não houver.
+// Com landing pública: sem sessão mostra #public-landing; auth só por CTA ou fluxos especiais.
 // Registra listener para reagir a SIGNED_IN/SIGNED_OUT.
 // Em sessão ativa, dispara remoteHydrate para reconciliar com o Supabase.
 (async function bootstrapAuth(){
@@ -10992,11 +11340,11 @@ render();
       _syncSetOffline&&_syncSetOffline(true);
       return;
     }
-    const{data}=await window.supabase.auth.getSession();
-    const session=data&&data.session;
+    const session=await _authGetSessionWithRetry();
     if(session){
       window.hideAuthScreen&&window.hideAuthScreen();
       _syncSetOffline&&_syncSetOffline(false);
+      _authStripOAuthQueryFromUrl();
       // Resolve identidade pra last editor / colab + avatar sidebar
       try{if(typeof _phaseC_resolveCurrentUser==='function')_phaseC_resolveCurrentUser().then(function(){window._refreshSidebarAvatar&&window._refreshSidebarAvatar();});}catch(e){}
       // Hydrate em paralelo
@@ -11004,13 +11352,14 @@ render();
       // Se chegou com token, abre o roteiro compartilhado em vez de cair no fluxo normal
       if(pendingToken)window.openSharedByToken&&window.openSharedByToken(pendingToken);
     }else{
-      window.showAuthScreen&&window.showAuthScreen();
+      window.showPublicLanding&&window.showPublicLanding();
       _syncSetOffline&&_syncSetOffline(true);
     }
     window.supabase.auth.onAuthStateChange(function(event,sess){
       if(event==='SIGNED_IN'){
         window.hideAuthScreen&&window.hideAuthScreen();
         _syncSetOffline&&_syncSetOffline(false);
+        _authStripOAuthQueryFromUrl();
         try{if(typeof _phaseC_resolveCurrentUser==='function')_phaseC_resolveCurrentUser().then(function(){window._refreshSidebarAvatar&&window._refreshSidebarAvatar();});}catch(e){}
         window.remoteHydrate&&window.remoteHydrate();
         if(pendingToken){
@@ -11021,7 +11370,8 @@ render();
         // Reconecta canais realtime com o novo JWT
         try{if(typeof _phaseC_resubscribeAll==='function')_phaseC_resubscribeAll();}catch(e){}
       }else if(event==='SIGNED_OUT'){
-        window.showAuthScreen&&window.showAuthScreen();
+        window.hideAuthScreen&&window.hideAuthScreen({keepAppHidden:true});
+        window.showPublicLanding&&window.showPublicLanding();
         _phaseB_ready=false;
         _lastRemoteDocIds=new Set();
         _persistRoteiroFails={};

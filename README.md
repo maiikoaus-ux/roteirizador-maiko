@@ -5,7 +5,7 @@
 - **`index.html`** — aplicação única (HTML + CSS + JS). Use este ficheiro como entrada no GitHub Pages ou qualquer hospedagem estática.
 - **`roteirizador-maiko-costa-v1.15.html`** — cópia espelho do mesmo código (útil para histórico de versão).
 
-O **logo já está incorporado** como SVG inline (`window.APP_LOGO_DATA_URL`): não é obrigatório enviar `logo-maiko-costa.png`. **Opcional:** coloque `logo-maiko-costa.png` na mesma pasta que `index.html`; ao abrir a app num servidor estático (HTTP/HTTPS), o ficheiro é lido e substitui o SVG; o nome pode ser alterado com `window.APP_LOGO_PNG_NAME` antes do carregamento. Em `file://` o `fetch` ao PNG pode falhar conforme o navegador — nesse caso defina `window.APP_LOGO_DATA_URL` no `<head>` ou sirva a pasta com um servidor local. Para outra marca sem PNG, substitua o valor no script em `<head>` e mantenha `data-app-logo="1"` nas tags `<img>` do logo para o export offline atualizar corretamente.
+O **logo já está incorporado** como SVG inline (`window.APP_LOGO_DATA_URL`): não é obrigatório ter o PNG. **Opcional:** o ficheiro por defeito é `assets/icons/logo-maiko-costa.png`; num servidor estático (HTTP/HTTPS) o `fetch` substitui o SVG. O caminho pode ser alterado com `window.APP_LOGO_PNG_NAME` antes do carregamento. Em `file://` o `fetch` ao PNG pode falhar conforme o navegador — nesse caso defina `window.APP_LOGO_DATA_URL` no `<head>` ou sirva a pasta com um servidor local. Para outra marca sem PNG, substitua o valor no script em `<head>` e mantenha `data-app-logo="1"` nas tags `<img>` do logo para o export offline atualizar corretamente.
 
 ## GitHub Pages
 

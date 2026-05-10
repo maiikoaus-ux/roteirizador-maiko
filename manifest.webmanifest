@@ -13,13 +13,13 @@
   "categories": ["productivity"],
   "icons": [
     {
-      "src": "logo-maiko-costa.png",
+      "src": "assets/icons/logo-maiko-costa.png",
       "type": "image/png",
       "sizes": "any",
       "purpose": "any"
     },
     {
-      "src": "logo-maiko-costa.png",
+      "src": "assets/icons/logo-maiko-costa.png",
       "type": "image/png",
       "sizes": "any",
       "purpose": "maskable"
